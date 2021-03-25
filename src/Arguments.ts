@@ -53,23 +53,6 @@ const Arguments = [{
     defaultValue: "openid profile offline_access",
     type: "string",
     validate: (arg: any): string => (arg ? "" : "Required")
-},
-{
-    displayName: "Protocol",
-    description: "Protocol to use",
-    defaultValue: "AAD",
-    type: "enum",
-    options: [{
-            displayName: "Azure AD",
-            value: "AAD",
-            description: "Azure AD v2 endpoints"
-        },
-        {
-            displayName: "OIDC",
-            value: "OIDC",
-            description: "OIDC-compliant endpoints"
-        }
-    ]
 }]
 
 export { Arguments }

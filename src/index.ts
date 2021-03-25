@@ -20,7 +20,7 @@ const templateTags = [{
     description: "Get an Azure AD Token",
     //disablePreview: () => true,
     args: Arguments,
-    async run(context: any, authority: string | undefined, tenantId: string | undefined, clientId: string | undefined, scopes: string | undefined, protocol: string | undefined) {
+    async run(context: any, authority: string | undefined, tenantId: string | undefined, clientId: string | undefined, scopes: string | undefined) {
         if (!authority) {
             throw new Error("'Authority' property is required");
         }
@@ -37,12 +37,8 @@ const templateTags = [{
             throw new Error("'Scopes' property is required");
         }
 
-        if (!protocol) {
-            throw new Error("'Protocol' property is required");
-        }
 
-
-        // TODO: Refresh the token when ncessary, get from cache
+        // TODO: Refresh the token when necessary, get from cache
         // TODO: Detect if the request is for the same set of paramters or not
         // TODO: Intrduce a way to have multiple identities
         if (cachedAuthResult) {
@@ -50,7 +46,7 @@ const templateTags = [{
         }
 
         const authorizationCodeFlow = new AuthorizationCodeFlow();
-        cachedAuthResult = await authorizationCodeFlow.authenticateAsync(authority, tenantId, clientId, scopes, protocol);
+        cachedAuthResult = await authorizationCodeFlow.authenticateAsync(authority, tenantId, clientId, scopes);
         return cachedAuthResult != null ? cachedAuthResult.accessToken : "";
     }
 }];

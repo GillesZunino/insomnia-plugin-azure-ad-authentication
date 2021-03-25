@@ -20,11 +20,11 @@ export default class AuthorizationCodeFlow {
     public constructor() {
     }
 
-    public async authenticateAsync(authority: string, tenantId: string, clientId: string, scopes: string, protocol: string): Promise<msal.AuthenticationResult | null> {
+    public async authenticateAsync(authority: string, tenantId: string, clientId: string, scopes: string): Promise<msal.AuthenticationResult | null> {
         const clientConfig: msal.Configuration = {
             auth: {
                 clientId: clientId,
-                protocolMode: protocol === "AAD" ? msal.ProtocolMode.AAD : msal.ProtocolMode.OIDC,
+                protocolMode: msal.ProtocolMode.AAD,
                 authority: `${authority}/${tenantId}`
             },
             system: {
