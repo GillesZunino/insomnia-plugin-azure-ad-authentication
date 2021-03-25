@@ -43,7 +43,8 @@
   ],
   "scripts": {
     "start": "tsdx watch --tsconfig ./tsconfig.json",
-    "build": "tsdx build --tsconfig ./tsconfig.json"
+    "build": "tsdx build --tsconfig ./tsconfig.json",
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "@azure/msal-node": "1.0.1",
