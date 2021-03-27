@@ -31,7 +31,7 @@ export class PromiseCompletionSource<T> {
     public then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2> {
         return this.internalPromise.then(onfulfilled);
     }
-    
+
     public catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult> {
         return this.internalPromise.catch(onrejected);
     }
