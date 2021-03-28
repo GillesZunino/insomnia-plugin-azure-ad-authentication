@@ -16,13 +16,13 @@ const templateTags = [{
   name: "azuread",
   displayName: "Azure AD Token",
   description: "Get an Azure AD access token",
-  liveDisplayName: (args: any) => {
+  liveDisplayName: (args: any[]) => {
     const htmlArrow = "&rArr;";
     const currentAuthenticationResult = publicClientApplication?.authenticationResult;
     if (currentAuthenticationResult) {
       return `Azure AD ${htmlArrow} [${currentAuthenticationResult.account?.username} - '${currentAuthenticationResult.scopes}']`;
     } else {
-      return `Azure AD ${htmlArrow} Not logged in`;
+      return `Azure AD ${htmlArrow} Not logged in [${args[0].value}]`;
     }
   },
 
