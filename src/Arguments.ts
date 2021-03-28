@@ -10,25 +10,25 @@ const Arguments = [{
     defaultValue: "https://login.microsoftonline.com",
     type: "enum",
     options: [{
-            displayName: "Azure AD (global service)",
-            value: "https://login.microsoftonline.com",
-            description: "Azure AD (global service - https://login.microsoftonline.com)"
-        },
-        {
-            displayName: "Azure AD for US Government",
-            value: "https://login.microsoftonline.us",
-            description: "Azure AD for US Government (https://login.microsoftonline.us)"
-        },
-        {
-            displayName: "Azure AD Germany",
-            value: "https://login.microsoftonline.de",
-            description: "Azure AD Germany (https://login.microsoftonline.de)"
-        },
-        {
-            displayName: "Azure AD China operated by 21Vianet",
-            value: "https://login.chinacloudapi.cn",
-            description: "Azure AD China operated by 21Vianet (https://login.chinacloudapi.cn)"
-        }
+        displayName: "Azure AD (global service)",
+        value: "https://login.microsoftonline.com",
+        description: "Azure AD (global service - https://login.microsoftonline.com)"
+    },
+    {
+        displayName: "Azure AD for US Government",
+        value: "https://login.microsoftonline.us",
+        description: "Azure AD for US Government (https://login.microsoftonline.us)"
+    },
+    {
+        displayName: "Azure AD Germany",
+        value: "https://login.microsoftonline.de",
+        description: "Azure AD Germany (https://login.microsoftonline.de)"
+    },
+    {
+        displayName: "Azure AD China operated by 21Vianet",
+        value: "https://login.chinacloudapi.cn",
+        description: "Azure AD China operated by 21Vianet (https://login.chinacloudapi.cn)"
+    }
     ]
 },
 {
