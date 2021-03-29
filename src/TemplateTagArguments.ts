@@ -34,12 +34,12 @@ const Arguments = [{
 },
 {
     displayName: "Directory (tenant) ID",
-    description: "Directory (tenant) ID ('common', 'organizations', a tenant name or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')",
-    help: "The Azure AD tenant. Can be 'common', 'organizations', a domain like 'contoso.com' or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'",
+    description: "Directory (tenant) ID ('common', 'consumers', 'organizations', a tenant name or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')",
+    help: "The Azure AD tenant. Can be 'common', 'consumers', 'organizations', a domain like 'contoso.com' or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'",
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isTenantIdValid(arg);
-        return isValid ? "" : "Must be 'common', 'organizations', a domain like 'contoso.com' or a tenant ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
+        return isValid ? "" : "Must be 'common', 'consumers', 'organizations', a domain like 'contoso.com' or a tenant ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
     }
 },
 {
@@ -66,3 +66,57 @@ const Arguments = [{
 
 export { Arguments }
 
+
+
+// {
+//     displayName: "Flow",
+//     description: "Azure AD flow",
+//     defaultValue: "authorization-code",
+//     type: "enum",
+//     options: [{
+//         displayName: "Authorization Code",
+//         value: "authorization-code",
+//         description: "Authorization Code"
+//     },
+//     {
+//         displayName: "Client Secret",
+//         value: "client-secret",
+//         description: "Client Secret"
+//     },
+//     {
+//         displayName: "On Behalf",
+//         value: "on-behalf",
+//         description: "On Behalf"
+//     }
+//     ]
+
+
+
+
+// {
+//     displayName: "DYanmic display name",
+
+//     // This works
+//     displayName: args => {
+//         switch (args[0].value) {
+//           case 'cookie':
+//             return 'Cookie Name';
+//           case 'parameter':
+//             return 'Query Parameter Name';
+//           case 'header':
+//             return 'Header Name';
+//           default:
+//             return 'Name';
+//         }
+//       },
+
+//     description: "a desceriprion",
+//     type: "string",
+//     // This works
+//     help: "ome random help",
+//     // This works
+//     hide: (args: any) => { debugger; return true; },
+
+//     validate: (arg: any): string => {
+//         return validator.default.isUUID(arg, 4) ? "" : "Must be a client ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
+//     }

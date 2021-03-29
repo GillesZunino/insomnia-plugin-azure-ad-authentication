@@ -56,13 +56,17 @@ export default class AzureADClientApplication {
         }
     }
 
-    public configure(authority: string, tenantId: string, clientId: string): boolean {
+    public async configure(authority: string, tenantId: string, clientId: string): Promise<boolean> {
         const tenantedAuthority: string = this.getTenantedAuthority(authority, tenantId);
         const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== clientId);
         if (configurationChanged) {
+            // Reconfigure the application
             this.clientConfig.auth.clientId = clientId;
             this.clientConfig.auth.authority = tenantedAuthority;
             this.publicClientApplication = new msal.PublicClientApplication(this.clientConfig);
+
+            // Log the current user out
+            await this.signOut();
         }
 
         return configurationChanged;

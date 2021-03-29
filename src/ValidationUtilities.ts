@@ -6,7 +6,7 @@ import * as validator from "validator";
 
 export function isTenantIdValid(tenantId: string | null | undefined): boolean {
     if (tenantId) {
-        return (tenantId === "common") || (tenantId === "organizations") || validator.default.isFQDN(tenantId) || validator.default.isUUID(tenantId, 4);
+        return (tenantId === "common") || (tenantId === "consumers") || (tenantId === "organizations") || validator.default.isFQDN(tenantId) || validator.default.isUUID(tenantId, 4);
     }
     return false;
 }

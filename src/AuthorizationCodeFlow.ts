@@ -33,13 +33,16 @@ export default class AuthorizationCodeFlow {
                 const authCodeUrlParameters: msal.AuthorizationUrlRequest = {
                     scopes: scopes,
                     redirectUri: AuthorizationCodeFlow.RedirectUri,
+                    prompt: "select_account"
                 };
 
                 // Get url to sign user in and consent to scopes needed for application
                 if (this.publicClientApplication.instance !== null) {
                     this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters).then((response) => {
                         res.redirect(response);
-                    }).catch((error) => console.log(JSON.stringify(error)));
+                    }).catch((error) => {
+                        authenticationResultPromiseCompletionSource.reject(error);
+                    });
                 }
             });
 
@@ -60,7 +63,6 @@ export default class AuthorizationCodeFlow {
 
                             res.sendStatus(200);
                         }).catch((error) => {
-                            console.log(error);
                             authenticationResultPromiseCompletionSource.reject(error);
                             res.status(500).send(error);
                         });
@@ -76,10 +78,14 @@ export default class AuthorizationCodeFlow {
 
             await open.default(AuthorizationCodeFlow.BaseUri);
 
-            const authCodeFinal: msal.AuthenticationResult | null = await authenticationResultPromiseCompletionSource.promise;
-
-            if (server) {
-                server.close();
+            let authCodeFinal: msal.AuthenticationResult | null = null;
+            try{
+                authCodeFinal = await authenticationResultPromiseCompletionSource.promise;
+            }
+            finally {
+                if (server) {
+                    server.close();
+                }
             }
 
             return authCodeFinal;

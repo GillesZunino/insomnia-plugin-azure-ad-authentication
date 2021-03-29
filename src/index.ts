@@ -76,7 +76,7 @@ const templateTags = [{
     }
   
     // Apply configuration - This handles cases where the config has not changed
-    publicClientApplication.configure(authority, tenantId, clientId);
+    await publicClientApplication.configure(authority, tenantId, clientId);
 
     // First, try to acquire a token silently
     const normalizedScopes: string[] = normalizeAzureADScopes(scopes);
