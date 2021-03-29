@@ -56,19 +56,16 @@ export default class AzureADClientApplication {
         }
     }
 
-    public configure(authority: string | undefined, tenantId: string | undefined, clientId: string | undefined): void {
-        if (authority && tenantId && clientId) {
-            // const configurationChanged: boolean = applyAuthority(authority, tenantId) || applyClientId(clientId);
-            // if (configurationChanged) {
-            // TODO: Update configuration and reset cached creds when things change
-            if (true) {
-                this.clientConfig.auth.clientId = clientId;
-                this.clientConfig.auth.authority = `${authority}/${tenantId}`;
-                this.publicClientApplication = new msal.PublicClientApplication(this.clientConfig);
-            }
-        } else {
-            this.publicClientApplication = null;
+    public configure(authority: string, tenantId: string, clientId: string): boolean {
+        const tenantedAuthority: string = this.getTenantedAuthority(authority, tenantId);
+        const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== clientId);
+        if (configurationChanged) {
+            this.clientConfig.auth.clientId = clientId;
+            this.clientConfig.auth.authority = tenantedAuthority;
+            this.publicClientApplication = new msal.PublicClientApplication(this.clientConfig);
         }
+
+        return configurationChanged;
     }
 
     public async authenticateInteractive(scopes: string[]): Promise<msal.AuthenticationResult | null> {
@@ -156,5 +153,11 @@ export default class AzureADClientApplication {
 
     private async removeSavedAccountId(): Promise<void> {
         return this.insomniaStore.removeItem(AzureADClientApplication.LastHomeAccountIdKey);
+    }
+
+    private getTenantedAuthority(authority: string, tenantId: string): string {
+        const authorityNoTrailingSlash: string = authority.replace(/\/+$/, "");
+        const tenantIdNoLeadingSlash: string = tenantId.replace(/^\/+/, "");
+        return `${authorityNoTrailingSlash}/${tenantIdNoLeadingSlash}`;
     }
 }

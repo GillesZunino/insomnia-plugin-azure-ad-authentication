@@ -2,7 +2,8 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-import * as validator from "validator";
+import { isTenantIdValid, isClientIdValid, isScopesValid } from "./ValidationUtilities";
+
 
 const Arguments = [{
     displayName: "Authority",
@@ -37,7 +38,8 @@ const Arguments = [{
     help: "The Azure AD tenant. Can be 'common', 'organizations', a domain like 'contoso.com' or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'",
     type: "string",
     validate: (arg: any): string => {
-        return (arg === "common") || (arg === "organizations") || validator.default.isUUID(arg, 4) ? "" : "Must be 'common', 'organizations' or a tenant ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
+        const isValid: boolean = isTenantIdValid(arg);
+        return isValid ? "" : "Must be 'common', 'organizations', a domain like 'contoso.com' or a tenant ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
     }
 },
 {
@@ -46,7 +48,8 @@ const Arguments = [{
     help: "Application (client) ID from the Azure Portal. It is a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'",
     type: "string",
     validate: (arg: any): string => {
-        return validator.default.isUUID(arg, 4) ? "" : "Must be a client ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
+        const isValid: boolean = isClientIdValid(arg);
+        return isValid ? "" : "Must be a client ID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'";
     }
 },
 {
@@ -55,7 +58,10 @@ const Arguments = [{
     help: "A space separated list of resources to request the token for. Examples include 'User.Read' or 'openid profile'",
     defaultValue: "openid profile offline_access",
     type: "string",
-    validate: (arg: any): string => (arg ? "" : "Required")
+    validate: (arg: any): string => {
+        const isValid: boolean = isScopesValid(arg);
+        return isValid ? "" : "Must be a list of scopes like 'openid User.Read'";
+    }
 }]
 
 export { Arguments }

@@ -6,10 +6,15 @@ import * as msal from "@azure/msal-node";
 
 import { Arguments } from "./TemplateTagArguments";
 import { getActions } from "./TemplateTagActions";
+import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes } from "./ValidationUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
 
 let publicClientApplication: AzureADClientApplication = new AzureADClientApplication();
+
+function isSendingRequest(context: any): boolean {
+  return context.renderPurpose === "send";
+}
 
 
 const templateTags = [{
@@ -33,44 +38,55 @@ const templateTags = [{
     // Configure the Azure AD persistence store to retrieve saved accounts
     publicClientApplication.ensureStore(context.store);
 
+    
     // Validate arguments
     const authority: string | undefined = args[0];
     const tenantId: string | undefined = args[1];
-    const clientId: string | undefined= args[2];
+    const clientId: string | undefined = args[2];
     const scopes: string | undefined = args[3];
-    const flow: string | undefined = args[4];
 
+    // TODO: authority
     if (!authority) {
       throw new Error("'Authority' property is required");
     }
 
+
+    // Tenant ID
     if (!tenantId) {
       throw new Error("'Directory (tenant) ID' property is required");
     }
+    if (!isTenantIdValid(tenantId)) {
+      throw new Error("'Directory (tenant) ID' property is invalid");
+    }
 
+    // Client ID
     if (!clientId) {
       throw new Error("'Application (client) ID' property is required");
     }
+    if (!isClientIdValid(clientId)) {
+      throw new Error("'Application (client) ID' property is invalid");
+    }
 
+    // Scopes
     if (!scopes) {
       throw new Error("'Scopes' property is required");
     }
-
-    if (!flow) {
-      throw new Error("'Flow' property is required");
+    if (!isScopesValid(scopes)) {
+      throw new Error("'Scopes' property must contain at least one valid entry");
     }
-
+  
+    // Apply configuration - This handles cases where the config has not changed
     publicClientApplication.configure(authority, tenantId, clientId);
 
-    const splitScopes: string[] = scopes.split(" ");
-
-    const silentAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateSilent(splitScopes);
+    // First, try to acquire a token silently
+    const normalizedScopes: string[] = normalizeAzureADScopes(scopes);
+    const silentAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateSilent(normalizedScopes);
     if (silentAuthenticationResult) {
       return silentAuthenticationResult.accessToken;
     } else {
-      // Only log in interactively when a request is being sent
-      if (context.renderPurpose === "send") {
-        const interactiveAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateInteractive(splitScopes);
+      // Only offer to log in interactively when a request is being sent
+      if (isSendingRequest(context)) {
+        const interactiveAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateInteractive(normalizedScopes);
         if (interactiveAuthenticationResult) {
           return interactiveAuthenticationResult.accessToken;
         } else {

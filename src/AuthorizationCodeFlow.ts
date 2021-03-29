@@ -35,13 +35,12 @@ export default class AuthorizationCodeFlow {
                     redirectUri: AuthorizationCodeFlow.RedirectUri,
                 };
 
-                // get url to sign user in and consent to scopes needed for application
+                // Get url to sign user in and consent to scopes needed for application
                 if (this.publicClientApplication.instance !== null) {
                     this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters).then((response) => {
                         res.redirect(response);
                     }).catch((error) => console.log(JSON.stringify(error)));
                 }
-
             });
 
             app.get("/redirect", (req, res) => {
