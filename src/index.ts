@@ -21,7 +21,7 @@ const templateTags = [{
   name: "azuread",
   displayName: "Azure AD Token",
   description: "Get an Azure AD access token",
-  liveDisplayName: (args: any[]) => {
+  liveDisplayName: (args: any[]): string | null => {
     const htmlArrow = "&rArr;";
     const currentAuthenticationResult = publicClientApplication?.authenticationResult;
     if (currentAuthenticationResult) {
@@ -34,7 +34,7 @@ const templateTags = [{
   args: Arguments,
   actions: getActions(publicClientApplication),
 
-  async run(context: any, ...args: any[]) {
+  async run(context: any, ...args: any[]): Promise<string | null | undefined> {
     // Configure the Azure AD persistence store to retrieve saved accounts
     publicClientApplication.ensureStore(context.store);
 
