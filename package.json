@@ -49,7 +49,7 @@
   "dependencies": {
     "@azure/msal-node": "1.0.1",
     "validator": "13.5.2",
-    "open": "8.0.4",
+    "open": "8.0.5",
     "express": "4.17.1"
   },
   "devDependencies": {
