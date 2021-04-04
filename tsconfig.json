@@ -32,9 +32,8 @@
       "rootDir": "./src",
       "outDir": "./dist",
 
-      "importHelpers": true,
-      "declaration": true,
-      "declarationMap": true,
+      "importHelpers": false,
+      "declaration": false,
       "strict": true,
       "noImplicitAny": true,
       "strictNullChecks": true,
