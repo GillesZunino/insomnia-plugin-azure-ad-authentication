@@ -18,15 +18,14 @@
     "buildOnSave": false,
 
     "compilerOptions": {
-      "target": "es5",
-      "module": "esnext",
+      "target": "es2020",
+      "module": "es2015",
       "moduleResolution": "node",
       "esModuleInterop": true,
       "sourceMap": true,
 
       "lib": [
-        "dom",
-        "esnext"
+        "es2020"
       ],
 
       "rootDir": "./src",
