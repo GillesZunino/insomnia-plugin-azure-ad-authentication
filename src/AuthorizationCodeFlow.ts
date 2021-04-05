@@ -49,8 +49,8 @@ export default class AuthorizationCodeFlow {
                         response.redirect(authRedirectUri);
                     }
                     catch (e) {
-                        authenticationResultPromiseCompletionSource.reject(e);
                         response.status(200).send(this.formatErrorHtml(e));
+                        authenticationResultPromiseCompletionSource.reject(e);
                     }
                 }
             });
@@ -68,13 +68,14 @@ export default class AuthorizationCodeFlow {
                     // Redeem the code for an authentication result
                     if (this.publicClientApplication.instance !== null) {
                         try {
+                            response.status(200).send(SuccessHtml);
+
                             const authenticationResult: msal.AuthenticationResult | null = await this.publicClientApplication.instance.acquireTokenByCode(tokenRequest);
                             authenticationResultPromiseCompletionSource.resolve(authenticationResult);
-                            response.status(200).send(SuccessHtml);
                         }
                         catch (e) {
-                            authenticationResultPromiseCompletionSource.reject(e);
                             response.status(200).send(this.formatErrorHtml(e));
+                            authenticationResultPromiseCompletionSource.reject(e);
                         }
                     }
                 }
@@ -85,8 +86,8 @@ export default class AuthorizationCodeFlow {
                     const error: Error = new Error(`${errorCode} - ${errorDescription}`);
 
                     // Inform the caller of the failure and the user via the browser by returning HTML
-                    authenticationResultPromiseCompletionSource.reject(error);
                     response.status(200).send(this.formatErrorHtml(error));
+                    authenticationResultPromiseCompletionSource.reject(error);
                 }
             });
 
