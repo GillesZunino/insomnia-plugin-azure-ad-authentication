@@ -62,7 +62,7 @@ const Arguments = [{
         const isValid: boolean = isScopesValid(arg);
         return isValid ? "" : "Must be a list of scopes like 'openid User.Read'";
     }
-}]
+}];
 
 export { Arguments }
 

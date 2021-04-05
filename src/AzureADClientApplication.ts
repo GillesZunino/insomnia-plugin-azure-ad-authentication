@@ -24,7 +24,7 @@ export default class AzureADClientApplication {
         // Store
         this.insomniaStore = null;
 
-        // Last sucessful authentication result
+        // Last successful authentication result
         this.currentAuthenticationResult = null;
 
         // Azure AD application configuration
@@ -86,7 +86,9 @@ export default class AzureADClientApplication {
             }
         }
         catch (e) {
-            // TODO: Handle error
+            this.currentAuthenticationResult = null;
+            await this.removeSavedAccountId();
+            throw e;
         }
 
         return this.currentAuthenticationResult;
@@ -103,14 +105,14 @@ export default class AzureADClientApplication {
                 // With an AccountInfo, try to get a token silently - We always call MSAL for an opportunity to refresh the token as needed
                 if (savedAccountInfo) {
                     try {
-                        const silentAuthenticationResult: msal.AuthenticationResult | null = await this.instance?.acquireTokenSilent({
+                        this.currentAuthenticationResult = await this.instance?.acquireTokenSilent({
                             account: savedAccountInfo,
                             scopes: scopes
                         });
-                        this.currentAuthenticationResult = silentAuthenticationResult ? silentAuthenticationResult : null;
                     }
                     catch (e) {
-                        // TODO: Handle error
+                        this.currentAuthenticationResult = null;
+                        throw e;
                     }
                 }
             }

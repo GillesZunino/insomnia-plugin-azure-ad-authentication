@@ -33,7 +33,6 @@ async function pluginMain(context: any, ...args: any[]): Promise<string | null |
     throw new Error("'Authority' property is required");
   }
 
-  //debugger;
 
   // Tenant ID
   if (!tenantId) {
@@ -65,22 +64,27 @@ async function pluginMain(context: any, ...args: any[]): Promise<string | null |
 
   // First, try to acquire a token silently
   const normalizedScopes: string[] = normalizeAzureADScopes(scopes);
-  const silentAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateSilent(normalizedScopes);
-  if (silentAuthenticationResult) {
-    return silentAuthenticationResult.accessToken;
-  } else {
-    // Only offer to log in interactively when a request is being sent
-    if (isSendingRequest(context)) {
-      const interactiveAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateInteractive(normalizedScopes);
-      if (interactiveAuthenticationResult) {
-        return interactiveAuthenticationResult.accessToken;
-      } else {
-        // TODO: Error handling
-      }
+  try {
+    const silentAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateSilent(normalizedScopes);
+    if (silentAuthenticationResult) {
+      return silentAuthenticationResult.accessToken;
     }
-
-    return "Send a request to log in";
   }
+  catch (e) {
+    console.warn(`Could not get a token silently - ${e.message}`);
+  }
+
+  // If we could not acquire a token silently, offer to log in interactively when a request is being sent
+  if (isSendingRequest(context)) {
+    const interactiveAuthenticationResult: msal.AuthenticationResult | null = await publicClientApplication.authenticateInteractive(normalizedScopes);
+    if (interactiveAuthenticationResult) {
+      return interactiveAuthenticationResult.accessToken;
+    } else {
+      throw new Error("Could not retrieve a token from Azure AD - Unspecified error");
+    }
+  }
+
+  return "Send a request to log in";
 }
 
 function liveDisplayName(args: any[]): string | null {
