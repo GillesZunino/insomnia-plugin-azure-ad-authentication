@@ -42,6 +42,11 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 # Azure AD Application Configuration
 This plugin current assumes the Azure AD application is configured as a Mobile and desktop application with redirect uri `http://127.0.0.1:1234/redirect`. At the moment, the redirect uri cannot be customized.
 
+# Actions
+The plugin allows users to log out or clear the cache to forget all saved accounts. These capabilities are accessible via the "Edit Tag" dialog:
+
+   ![Actions](images/actions.png)
+
 # Future Improvements
 Enhancements include:
 
