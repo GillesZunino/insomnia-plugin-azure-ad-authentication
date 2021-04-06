@@ -5,6 +5,7 @@
 import { Server } from "node:http";
 import { ChildProcess } from "child_process";
 import express from "express";
+import { createHttpTerminator, HttpTerminator } from "http-terminator";
 import * as open from "open";
 import * as msal from "@azure/msal-node";
 
@@ -35,23 +36,27 @@ export default class AuthorizationCodeFlow {
             const app: express.Application = express();
 
             app.get("/", async (request, response) => {
-                const authCodeUrlParameters: msal.AuthorizationUrlRequest = {
-                    scopes: scopes,
-                    redirectUri: AuthorizationCodeFlow.RedirectUri,
-                    responseMode: msal.ResponseMode.QUERY,
-                    prompt: "select_account"
-                };
-
                 // Get url to sign user in and consent to scopes needed for application
                 if (this.publicClientApplication.instance !== null) {
+                    const authCodeUrlParameters: msal.AuthorizationUrlRequest = {
+                        scopes: scopes,
+                        redirectUri: AuthorizationCodeFlow.RedirectUri,
+                        responseMode: msal.ResponseMode.QUERY,
+                        prompt: "select_account"
+                    };
+
                     try {
                         const authRedirectUri: string = await this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters);
                         response.redirect(authRedirectUri);
                     }
                     catch (e) {
-                        response.status(200).send(this.formatErrorHtml(e));
+                        response.status(200).send(this.formatErrorHtml(e)).end();
                         authenticationResultPromiseCompletionSource.reject(e);
                     }
+                } else {
+                    const error: Error = new Error("Azure AD Public Client Application was not initialized properly");
+                    response.status(200).send(this.formatErrorHtml(error)).end();
+                    authenticationResultPromiseCompletionSource.reject(error);
                 }
             });
 
@@ -68,13 +73,13 @@ export default class AuthorizationCodeFlow {
                     // Redeem the code for an authentication result
                     if (this.publicClientApplication.instance !== null) {
                         try {
-                            response.status(200).send(SuccessHtml);
+                            response.status(200).send(SuccessHtml).end();
 
                             const authenticationResult: msal.AuthenticationResult | null = await this.publicClientApplication.instance.acquireTokenByCode(tokenRequest);
                             authenticationResultPromiseCompletionSource.resolve(authenticationResult);
                         }
                         catch (e) {
-                            response.status(200).send(this.formatErrorHtml(e));
+                            response.status(200).send(this.formatErrorHtml(e)).end();
                             authenticationResultPromiseCompletionSource.reject(e);
                         }
                     }
@@ -86,19 +91,21 @@ export default class AuthorizationCodeFlow {
                     const error: Error = new Error(`${errorCode} - ${errorDescription}`);
 
                     // Inform the caller of the failure and the user via the browser by returning HTML
-                    response.status(200).send(this.formatErrorHtml(error));
+                    response.status(200).send(this.formatErrorHtml(error)).end();
                     authenticationResultPromiseCompletionSource.reject(error);
                 }
             });
 
-    
+
             // Trigger the authentication flow: Open the default browser, point it to '/'. This starts the Azure AD Authorization Code flow
             let server: Server | null = null;
+            let httpConnectionsTerminator: HttpTerminator | null = null;
             let browserProcess: ChildProcess | null = null;
 
             try {
                 // Listen for requests
                 server = app.listen(AuthorizationCodeFlow.Port, () => console.log(`Listening on port ${AuthorizationCodeFlow.Port}`));
+                httpConnectionsTerminator = createHttpTerminator({ server: server, gracefulTerminationTimeout: 1000 });
 
                 // Open the user's default web browser and navigate it to the redirect uri (aka '/' handler above)
                 browserProcess = await open.default(AuthorizationCodeFlow.BaseUri);
@@ -107,8 +114,11 @@ export default class AuthorizationCodeFlow {
                 authenticationResult = await authenticationResultPromiseCompletionSource.promise;
             }
             finally {
-                if (server) {
-                    server.close();
+                if (httpConnectionsTerminator) {
+                    // Force the Http server to stop listening for connection and close all currently established ones
+                    await httpConnectionsTerminator.terminate();
+                    httpConnectionsTerminator = null;
+                    server = null;
                 }
             }
         }
