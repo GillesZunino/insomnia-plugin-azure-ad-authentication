@@ -21,7 +21,7 @@
   "insomnia": {
     "name": "azure-ad-authentication",
     "displayName": "Azure AD Token",
-    "description": "Easily retrieve Azure AD tokens and use them in Insomnia requests",
+    "description": "Easily retrieve Azure AD tokens",
     "images": {
       "icon": "images/azure-active-directory.svg",
       "cover": "images/azure-active-directory.svg"
