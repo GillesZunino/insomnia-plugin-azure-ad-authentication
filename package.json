@@ -37,7 +37,8 @@
   },
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "images/azure-active-directory.svg"
   ],
   "scripts": {
     "build:dev": "npx webpack --config webpack.dev.js",
