@@ -4,31 +4,25 @@
 
 import AzureADClientApplication from "./AzureADClientApplication";
 
+export default class TemplateTagActions {
+  private azureAdClientApplication: AzureADClientApplication;
 
-let publicClientApplication: AzureADClientApplication | null = null;
-
-
-const actions = [
-  {
-    name: "Sign out",
-    icon: "fa fa-sign-out",
-    run: (context: any) => publicClientApplication?.signOut()
-  },
-  {
-    name: "Clear Azure AD cache",
-    icon: "fa fa-trash",
-    run: (context: any) => publicClientApplication?.clearCache()
-  }
-];
-
-
-function getActions(azureADClientApplication: AzureADClientApplication): any[] {
-  if (publicClientApplication === null) {
-    publicClientApplication = azureADClientApplication;
+  public constructor(azureAdClientApplication: AzureADClientApplication) {
+    this.azureAdClientApplication = azureAdClientApplication;
   }
 
-  return actions;
+  public getActions(): any[] {
+    return [
+      {
+        name: "Sign out",
+        icon: "fa fa-sign-out",
+        run: (context: any) => this.azureAdClientApplication.signOut()
+      },
+      {
+        name: "Clear Azure AD cache",
+        icon: "fa fa-trash",
+        run: (context: any) => this.azureAdClientApplication.clearCache()
+      }
+    ];
+  }
 }
-
-
-export { getActions }
