@@ -22,7 +22,7 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 # Usage
 1. Open a new request, switch to the "Headers" tab,
 2. In the header name field, enter `Authorization`,
-3. In the value field type `Bearer` <kbd>Ctrl + space</kbd> `azure`. This will bring the template tag menu and reveal the Azure AD Authorization template:
+3. In the value field type `Bearer` <kbd>control</kbd> + <kbd>space</kbd> `azure`. This will bring the template tag menu and reveal the Azure AD Authorization template:
 
    ![Ctrl+Space Template Tag Menu](images/create-tag.png)
 
