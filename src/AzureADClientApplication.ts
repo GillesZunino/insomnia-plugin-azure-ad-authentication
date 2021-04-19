@@ -60,13 +60,15 @@ export default class AzureADClientApplication {
         const tenantedAuthority: string = this.getTenantedAuthority(authority, tenantId);
         const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== clientId);
         if (configurationChanged) {
+            // Assume we can restore a previous session if we receive configuration for the first time - Otherwise, log the current user out
+            if (this.clientConfig.auth.authority || this.clientConfig.auth.clientId) {
+                await this.signOut();
+            }
+
             // Reconfigure the application
             this.clientConfig.auth.clientId = clientId;
             this.clientConfig.auth.authority = tenantedAuthority;
             this.publicClientApplication = new msal.PublicClientApplication(this.clientConfig);
-
-            // Log the current user out
-            await this.signOut();
         }
 
         return configurationChanged;
