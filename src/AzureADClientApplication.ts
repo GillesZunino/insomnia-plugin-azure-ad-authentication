@@ -72,10 +72,10 @@ export default class AzureADClientApplication {
         return configurationChanged;
     }
 
-    public async authenticateInteractive(scopes: string[]): Promise<msal.AuthenticationResult | null> {
+    public async authenticateInteractive(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
         try {
             const authorizationCodeFlow: AuthorizationCodeFlow = new AuthorizationCodeFlow(this);
-            this.currentAuthenticationResult = await authorizationCodeFlow.authenticateInteractive(scopes);
+            this.currentAuthenticationResult = await authorizationCodeFlow.authenticateInteractive(scopes, redirectUri);
             if (this.currentAuthenticationResult) {
                 const homeAccountId: string | undefined = this.currentAuthenticationResult.account?.homeAccountId;
                 if (homeAccountId) {

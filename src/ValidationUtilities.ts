@@ -2,6 +2,7 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
+import { URL } from "url";
 import * as validator from "validator";
 
 export function isTenantIdValid(tenantId: string | null | undefined): boolean {
@@ -23,6 +24,16 @@ export function isScopesValid(scopes: string | null | undefined): boolean {
         const normalizedScopes: string[] = normalizeAzureADScopes(scopes);
         return normalizedScopes.length > 0;
     }
+    return false;
+}
+
+export function isRedirectUriValid(redirectUri: string | null | undefined): boolean {
+    if (redirectUri) {
+      const parsedRedirectUri: URL = new URL(redirectUri);
+      // Must be HTTP (and not HTTPS), must point to '127.0.0.1', no query string, no hash
+      return (parsedRedirectUri.protocol === "http:") && (parsedRedirectUri.hostname === "127.0.0.1") && (parsedRedirectUri.search === "") && (parsedRedirectUri.hash === "");
+    }
+
     return false;
 }
 

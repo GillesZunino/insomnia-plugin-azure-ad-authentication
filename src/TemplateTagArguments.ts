@@ -2,7 +2,7 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-import { isTenantIdValid, isClientIdValid, isScopesValid } from "./ValidationUtilities";
+import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid } from "./ValidationUtilities";
 
 
 const Arguments = [{
@@ -62,7 +62,19 @@ const Arguments = [{
         const isValid: boolean = isScopesValid(arg);
         return isValid ? "" : "Must be a list of scopes like 'openid User.Read'";
     }
-}];
+},
+{
+    displayName: "Redirect URI",
+    description: "A URI Azure AD will accept as destination when returning authentication responses (tokens) after successfully authenticating users",
+    help: "One of the Redirect URI configured in Azure AD. Examples include 'http://127.0.0.1:1234/redirect' or 'http://127.0.0.1:6090/openid'",
+    defaultValue: "http://127.0.0.1:1234/redirect",
+    type: "string",
+    validate: (arg: any): string => {
+        const isValid: boolean = isRedirectUriValid(arg);
+        return isValid ? "" : "Must be a valid Rdirect URI like 'http://127.0.0.1:1234/redirect'. Prefer 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
+    }
+}
+];
 
 export { Arguments }
 

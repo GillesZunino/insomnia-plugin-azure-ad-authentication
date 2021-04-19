@@ -2,6 +2,7 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
+import { URL } from "url";
 import { Server } from "node:http";
 import { ChildProcess } from "child_process";
 import express from "express";
@@ -16,18 +17,19 @@ import { PromiseCompletionSource } from "./PromiseCompletionSource";
 import AzureADClientApplication from "./AzureADClientApplication";
 
 export default class AuthorizationCodeFlow {
-    private static readonly Port: number = 1234;
-    private static readonly HostName: string = "127.0.0.1";
-    private static readonly BaseUri: string = `http://${AuthorizationCodeFlow.HostName}:${AuthorizationCodeFlow.Port}`;
-    private static readonly RedirectUri: string = `http://${AuthorizationCodeFlow.HostName}:${AuthorizationCodeFlow.Port}/redirect`;
-
     private publicClientApplication: AzureADClientApplication;
 
     public constructor(publicClientApplication: AzureADClientApplication) {
         this.publicClientApplication = publicClientApplication;
     }
 
-    public async authenticateInteractive(scopes: string[]): Promise<msal.AuthenticationResult | null> {
+    public async authenticateInteractive(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
+        // Derive port, redirect path and base uri from the redirect uri given
+        const parsedRedirectUri: URL = new URL(redirectUri);
+        const redirectPort: number = parseInt(parsedRedirectUri.port);
+        const redirectPath: string = `${parsedRedirectUri.pathname}`;
+        const redirectBaseUri: string = `${parsedRedirectUri.protocol}//${parsedRedirectUri.host}`;
+
         let authenticationResult: msal.AuthenticationResult | null = null;
 
         if (this.publicClientApplication.instance !== null) {
@@ -40,7 +42,7 @@ export default class AuthorizationCodeFlow {
                 if (this.publicClientApplication.instance !== null) {
                     const authCodeUrlParameters: msal.AuthorizationUrlRequest = {
                         scopes: scopes,
-                        redirectUri: AuthorizationCodeFlow.RedirectUri,
+                        redirectUri: redirectUri,
                         responseMode: msal.ResponseMode.QUERY,
                         prompt: "select_account"
                     };
@@ -60,14 +62,14 @@ export default class AuthorizationCodeFlow {
                 }
             });
 
-            app.get("/redirect", async (request, response) => {
+            app.get(redirectPath, async (request, response) => {
                 if (typeof request.query?.code === "string") {
                     // MSAL returned a code which we can redeem for a token
                     const code: string | null = request.query?.code as string;
                     const tokenRequest: msal.AuthorizationCodeRequest = {
                         code: code,
                         scopes: scopes,
-                        redirectUri: AuthorizationCodeFlow.RedirectUri,
+                        redirectUri: redirectUri,
                     };
 
                     // Redeem the code for an authentication result
@@ -104,11 +106,11 @@ export default class AuthorizationCodeFlow {
 
             try {
                 // Listen for requests
-                server = app.listen(AuthorizationCodeFlow.Port, () => console.log(`Listening on port ${AuthorizationCodeFlow.Port}`));
+                server = app.listen(redirectPort, () => console.log(`Listening on port ${redirectPort}`));
                 httpConnectionsTerminator = createHttpTerminator({ server: server, gracefulTerminationTimeout: 1000 });
 
                 // Open the user's default web browser and navigate it to the redirect uri (aka '/' handler above)
-                browserProcess = await open.default(AuthorizationCodeFlow.BaseUri);
+                browserProcess = await open.default(redirectBaseUri);
 
                 // Wait for browser interaction to complete
                 authenticationResult = await authenticationResultPromiseCompletionSource.promise;
