@@ -53,7 +53,6 @@ The plugin allows users to log out or clear the cache to forget all saved accoun
 # Future Improvements
 Enhancements include:
 
-* Customizable redirect Uri,
 * Encrypt tokens saved to the Insomnia cache,
 * Implement 'on behalf' flow,
 * Implement 'client secret' credentials,
