@@ -71,7 +71,7 @@ const Arguments = [{
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
-        return isValid ? "" : "Must be a valid Rdirect URI like 'http://127.0.0.1:1234/redirect'. Prefer 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
+        return isValid ? "" : "Must be a valid Rdirect URI like 'http://127.0.0.1:1234/redirect'. Use 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
     }
 }
 ];
