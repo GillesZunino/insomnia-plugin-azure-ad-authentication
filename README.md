@@ -30,18 +30,21 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
    ![Logged out Template Tag](images/Loggedout-tag.png)
 
-5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID and the desired scopes. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`.
+5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`.
 
    ![Template Tag Properties](images/tag-properties.png)
 
-6. Close the Edit dialog,
+6. Close the Edit Tag dialog,
 7. Send a request by pressing "Send". A browser window will appears and take you through the regular Azure AD login flow possibly including consent. When the authentication completes, the tag will display its logged in form as follows:
 
    ![Template Tag Properties](images/loggedin-tag.png)
 
-# Azure AD Application Configuration
-This plugin current assumes the Azure AD application is configured as a Mobile and desktop application with redirect uri `http://127.0.0.1:1234/redirect`. At the moment, the redirect uri cannot be customized.
+# Configuring the Azure AD Application
+This plugin assumes the Azure AD application specified by 'Application (client) ID' is configured as a Mobile and Desktop application with Redirect URI specified during step 5 above. By default, the Redirect URI is `http://127.0.0.1:1234/redirect`. An example of Azure AD application Redirect URIs can be seen below:
 
+   ![Azure AD Redirect URIs](images/AzureAD-Mobile-Desktop-ReturnUri.png)
+
+For web browser flows, it is best to choose a URI targetting `127.0.0.1` instea of `localhost` since some web browsers block navigation to `http://localhost`.
 # Actions
 The plugin allows users to log out or clear the cache to forget all saved accounts. These capabilities are accessible via the "Edit Tag" dialog:
 
