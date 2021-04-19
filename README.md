@@ -34,7 +34,7 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
    ![Template Tag Properties](images/tag-properties.png)
 
-6. Close the Edit Tag dialog,
+6. Close the "Edit Tag" dialog,
 7. Send a request by pressing "Send". A browser window will appears and take you through the regular Azure AD login flow possibly including consent. When the authentication completes, the tag will display its logged in form as follows:
 
    ![Template Tag Properties](images/loggedin-tag.png)
