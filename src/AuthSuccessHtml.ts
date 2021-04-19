@@ -6,7 +6,7 @@ const SuccessHtml: string =
 `
 <html>
 <head>
-    <title>Authentication Failure</title>
+    <title>Authentication Success</title>
     <style>
         html {
             box-sizing: border-box;
