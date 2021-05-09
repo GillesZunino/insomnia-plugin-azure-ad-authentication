@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------------
 
 import { URL } from "url";
-import { Server } from "node:http";
+import { Server } from "http";
 import { ChildProcess } from "child_process";
 import express from "express";
 import { createHttpTerminator, HttpTerminator } from "http-terminator";
