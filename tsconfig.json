@@ -18,14 +18,14 @@
     "buildOnSave": false,
 
     "compilerOptions": {
-      "target": "es2020",
-      "module": "es2015",
+      "target": "ES2019",
+      "module": "CommonJS",
       "moduleResolution": "node",
       "esModuleInterop": true,
       "sourceMap": true,
 
       "lib": [
-        "es2020"
+        "ES2019"
       ],
 
       "rootDir": "./src",
