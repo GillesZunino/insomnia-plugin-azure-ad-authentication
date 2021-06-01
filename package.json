@@ -1,6 +1,6 @@
 {
   "name": "insomnia-plugin-azure-ad-authentication",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "license": "MIT",
   "author": {
     "name": "Gilles Zunino",
