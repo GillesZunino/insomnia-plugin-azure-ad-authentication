@@ -71,24 +71,24 @@ const Arguments = [{
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
-        return isValid ? "" : "Must be a valid Rdirect URI like 'http://127.0.0.1:1234/redirect'. Use 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
+        return isValid ? "" : "Must be a valid Redirect URI like 'http://127.0.0.1:1234/redirect'. Use 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
     }
 },
 {
     displayName: "Token Type",
-    description: "The type of token to be returned",
-    help: "Defines the type of token that will be returned by the plugin, either 'accessToken' or 'idToken' according to Azure AD response",
+    description: "Type of token to request",
+    help: "Access Token enable clients to securely call protected web APIs. Web APIs use access tokens to authenticate and authorize calls. Id Token carry information about the user and should not be used for authorization purposes.",
     defaultValue: "accessToken",
     type: "enum",
     options: [{
-        displayName: "AccessToken",
+        displayName: "Access Token",
         value: "accessToken",
-        description: "The app can use this token to authenticate to the secured resource, such as a web API"
+        description: "Securely call web APIs, authenticate and authorize"
     },
     {
-        displayName: "IdToken",
+        displayName: "Id Token",
         value: "idToken",
-        description: "The app can decode the segments of this token to request information about the user who signed in"
+        description: "Verify a user is who they claim to be"
     }]
 }
 ];
