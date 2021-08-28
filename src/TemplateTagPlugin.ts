@@ -7,6 +7,8 @@ import * as msal from "@azure/msal-node";
 import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid } from "./ValidationUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
+type TokenType = 'accessToken' | 'idToken';
+
 export default class TemplateTagPlugin {
     private azureAdClientApplication: AzureADClientApplication;
 
@@ -25,6 +27,7 @@ export default class TemplateTagPlugin {
         const clientId: string | undefined = args[2];
         const scopes: string | undefined = args[3];
         const redirectUri: string | undefined = args[4];
+        const tokenType: TokenType = args[5];
 
         if (!authority) {
             throw new Error("'Authority' property is required");
@@ -72,7 +75,7 @@ export default class TemplateTagPlugin {
         try {
             const silentAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateSilent(normalizedScopes);
             if (silentAuthenticationResult) {
-                return silentAuthenticationResult.accessToken;
+                return silentAuthenticationResult[tokenType]
             }
         }
         catch (e) {
@@ -83,7 +86,7 @@ export default class TemplateTagPlugin {
         if (this.isSendingRequest(context)) {
             const interactiveAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateInteractive(normalizedScopes, redirectUri);
             if (interactiveAuthenticationResult) {
-                return interactiveAuthenticationResult.accessToken;
+                return interactiveAuthenticationResult[tokenType];
             } else {
                 throw new Error("Could not retrieve a token from Azure AD - Unspecified error");
             }

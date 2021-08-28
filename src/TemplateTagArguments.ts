@@ -73,6 +73,23 @@ const Arguments = [{
         const isValid: boolean = isRedirectUriValid(arg);
         return isValid ? "" : "Must be a valid Rdirect URI like 'http://127.0.0.1:1234/redirect'. Use 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
     }
+},
+{
+    displayName: "Token Type",
+    description: "The type of token to be returned",
+    help: "Defines the type of token that will be returned by the plugin, either 'accessToken' or 'idToken' according to Azure AD response",
+    defaultValue: "accessToken",
+    type: "enum",
+    options: [{
+        displayName: "AccessToken",
+        value: "accessToken",
+        description: "The app can use this token to authenticate to the secured resource, such as a web API"
+    },
+    {
+        displayName: "IdToken",
+        value: "idToken",
+        description: "The app can decode the segments of this token to request information about the user who signed in"
+    }]
 }
 ];
 
