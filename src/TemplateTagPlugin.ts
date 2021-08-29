@@ -4,11 +4,10 @@
 
 import * as msal from "@azure/msal-node";
 
-import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid } from "./ValidationUtilities";
+import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid, isValidTokenType } from "./ValidationUtilities";
 import { getAuthenticationErrorMessageFromException } from "./AzureADUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
-type TokenType = 'accessToken' | 'idToken';
 
 export default class TemplateTagPlugin {
     private azureAdClientApplication: AzureADClientApplication;
@@ -28,7 +27,7 @@ export default class TemplateTagPlugin {
         const clientId: string | undefined = args[2];
         const scopes: string | undefined = args[3];
         const redirectUri: string | undefined = args[4];
-        const tokenType: TokenType = args[5];
+        const tokenType: string | undefined = args[5];
 
         if (!authority) {
             throw new Error("'Authority' property is required");
@@ -65,6 +64,14 @@ export default class TemplateTagPlugin {
         }
         if (!isRedirectUriValid(redirectUri)) {
             throw new Error("'Redirect URI' must be valid");
+        }
+
+        // Token type
+        if (!tokenType) {
+            throw new Error("'Token Type' property is required");
+        }
+        if (!isValidTokenType(tokenType)) {
+            throw new Error("'TokenType' property must be valid");
         }
 
 

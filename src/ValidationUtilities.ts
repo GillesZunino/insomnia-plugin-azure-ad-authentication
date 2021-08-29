@@ -33,8 +33,14 @@ export function isRedirectUriValid(redirectUri: string | null | undefined): bool
       // Must be HTTP (and not HTTPS), must point to '127.0.0.1', no query string, no hash
       return (parsedRedirectUri.protocol === "http:") && (parsedRedirectUri.hostname === "127.0.0.1") && (parsedRedirectUri.search === "") && (parsedRedirectUri.hash === "");
     }
-
     return false;
+}
+
+export function isValidTokenType(tokenType: string | null | undefined): boolean {
+      if (tokenType) {
+        return (tokenType === "accessToken") || (tokenType === "idToken");
+      }
+      return false;
 }
 
 export function normalizeAzureADScopes(scopes: string | null | undefined): string[] {
@@ -45,4 +51,4 @@ export function normalizeAzureADScopes(scopes: string | null | undefined): strin
     } else {
       return [];
     }
-  } 
+}
