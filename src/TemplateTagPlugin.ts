@@ -79,7 +79,8 @@ export default class TemplateTagPlugin {
             }
         }
         catch (e) {
-            console.warn(`Could not get a token silently - ${e.message}`);
+            const error: string = e instanceof Error ? (<Error> e).message : (<any> e).toString();
+            console.warn(`Could not get a token silently - ${error}`);
         }
 
         // If we could not acquire a token silently, offer to log in interactively when a request is being sent

@@ -51,8 +51,9 @@ export default class AuthorizationCodeFlow {
                         const authRedirectUri: string = await this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters);
                         response.redirect(authRedirectUri);
                     }
-                    catch (e) {
-                        response.status(200).send(this.formatErrorHtml(e)).end();
+                    catch (e: unknown) {
+                        const error: Error = e instanceof Error ? <Error> e : new Error(<any> e);
+                        response.status(200).send(this.formatErrorHtml(error)).end();
                         authenticationResultPromiseCompletionSource.reject(e);
                     }
                 } else {
@@ -81,7 +82,8 @@ export default class AuthorizationCodeFlow {
                             authenticationResultPromiseCompletionSource.resolve(authenticationResult);
                         }
                         catch (e) {
-                            response.status(200).send(this.formatErrorHtml(e)).end();
+                            const error: Error = e instanceof Error ? <Error> e : new Error(<any> e);
+                            response.status(200).send(this.formatErrorHtml(error)).end();
                             authenticationResultPromiseCompletionSource.reject(e);
                         }
                     }
