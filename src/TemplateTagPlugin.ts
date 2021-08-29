@@ -5,6 +5,7 @@
 import * as msal from "@azure/msal-node";
 
 import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid } from "./ValidationUtilities";
+import { getAuthenticationErrorMessageFromException } from "./AzureADUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
 type TokenType = 'accessToken' | 'idToken';
@@ -78,8 +79,8 @@ export default class TemplateTagPlugin {
                 return silentAuthenticationResult[tokenType]
             }
         }
-        catch (e) {
-            const error: string = e instanceof Error ? (<Error> e).message : (<any> e).toString();
+        catch (e: unknown) {
+            const error: string = getAuthenticationErrorMessageFromException(e);
             console.warn(`Could not get a token silently - ${error}`);
         }
 

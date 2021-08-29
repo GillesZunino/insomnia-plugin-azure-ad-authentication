@@ -14,6 +14,7 @@ import { SuccessHtml } from "./AuthSuccessHtml"
 import { FailedHtml } from "./AuthFailureHtml"
 
 import { PromiseCompletionSource } from "./PromiseCompletionSource";
+import { getAuthenticationErrorMessageFromException } from "./AzureADUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
 export default class AuthorizationCodeFlow {
@@ -52,13 +53,13 @@ export default class AuthorizationCodeFlow {
                         response.redirect(authRedirectUri);
                     }
                     catch (e: unknown) {
-                        const error: Error = e instanceof Error ? <Error> e : new Error(<any> e);
-                        response.status(200).send(this.formatErrorHtml(error)).end();
+                        response.status(200).send(this.formatErrorHtml(getAuthenticationErrorMessageFromException(e))).end();
                         authenticationResultPromiseCompletionSource.reject(e);
                     }
                 } else {
-                    const error: Error = new Error("Azure AD Public Client Application was not initialized properly");
-                    response.status(200).send(this.formatErrorHtml(error)).end();
+                    const message: string = "Azure AD Public Client Application was not initialized properly";
+                    const error: Error = new Error(message);
+                    response.status(200).send(this.formatErrorHtml(message)).end();
                     authenticationResultPromiseCompletionSource.reject(error);
                 }
             });
@@ -81,9 +82,8 @@ export default class AuthorizationCodeFlow {
                             const authenticationResult: msal.AuthenticationResult | null = await this.publicClientApplication.instance.acquireTokenByCode(tokenRequest);
                             authenticationResultPromiseCompletionSource.resolve(authenticationResult);
                         }
-                        catch (e) {
-                            const error: Error = e instanceof Error ? <Error> e : new Error(<any> e);
-                            response.status(200).send(this.formatErrorHtml(error)).end();
+                        catch (e: unknown) {
+                            response.status(200).send(this.formatErrorHtml(getAuthenticationErrorMessageFromException(e))).end();
                             authenticationResultPromiseCompletionSource.reject(e);
                         }
                     }
@@ -92,10 +92,11 @@ export default class AuthorizationCodeFlow {
                     // Error - Check if MSAL returned an error or simply no code
                     const errorCode: string = typeof request.query?.error === "string" ? request.query?.error : "Unspecified error";
                     const errorDescription: string = typeof request.query?.error_description === "string" ? request.query?.error_description : "Redirect by getAuthCodeUrl() failed";
-                    const error: Error = new Error(`${errorCode} - ${errorDescription}`);
+                    const message: string = `${errorCode} - ${errorDescription}`;
+                    const error: Error = new Error(message);
 
                     // Inform the caller of the failure and the user via the browser by returning HTML
-                    response.status(200).send(this.formatErrorHtml(error)).end();
+                    response.status(200).send(this.formatErrorHtml(message)).end();
                     authenticationResultPromiseCompletionSource.reject(error);
                 }
             });
@@ -130,7 +131,7 @@ export default class AuthorizationCodeFlow {
         return authenticationResult;
     }
 
-    private formatErrorHtml(error: Error): string {
-        return FailedHtml.replace("{{error}}", error.message);
+    private formatErrorHtml(message: string): string {
+        return FailedHtml.replace("{{error}}", message);
     }
 }
