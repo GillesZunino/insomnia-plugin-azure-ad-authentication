@@ -30,7 +30,7 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
    ![Logged out Template Tag](images/Loggedout-tag.png)
 
-5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`.
+5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`. Set Token Type to `Access Token` for APIs which  authorize or `Id Token` for APIs which verify the user is who they claim to be.
 
    ![Template Tag Properties](images/tag-properties.png)
 
