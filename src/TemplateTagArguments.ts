@@ -77,7 +77,7 @@ const Arguments = [{
 {
     displayName: "Token Type",
     description: "Type of token to request",
-    help: "Access Token enable clients to securely call protected web APIs. Web APIs use access tokens to authenticate and authorize calls. Id Token carry information about the user and should not be used for authorization purposes.",
+    help: "Access Token enable clients to securely call protected web APIs. Web APIs use access tokens to authenticate and authorize calls. Id Token carry information about the user and should not be used for authorization purposes",
     defaultValue: "accessToken",
     type: "enum",
     options: [{
