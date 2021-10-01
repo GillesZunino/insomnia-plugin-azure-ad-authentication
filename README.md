@@ -39,12 +39,12 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
    ![Template Tag Properties](images/loggedin-tag.png)
 
-# Configuring the Azure AD Application
-This plugin assumes the Azure AD application specified by 'Application (client) ID' is configured as a Mobile and Desktop application with Redirect URI specified during step 5 above. By default, the Redirect URI is `http://127.0.0.1:1234/redirect`. An example of Azure AD application Redirect URIs can be seen below:
+# Configuring the Azure AD application
+This plugin **requires** the Redirect URI specified during step 5 above to be configured under "**Mobile and Desktop applications**" or "**Web**" in Azure AD. Other platforms (including "Single Page Application") are not currently supported. See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for additional details. By default, the Redirect URI is `http://127.0.0.1:1234/redirect`. An example of Azure AD application Redirect URIs can be seen below:
 
    ![Azure AD Redirect URIs](images/AzureAD-Mobile-Desktop-ReturnUri.png)
 
-For web browser flows, it is best to choose a URI targetting `127.0.0.1` instea of `localhost` since some web browsers block navigation to `http://localhost`.
+For web browser flows, it is best to choose a Redirect URI targetting `127.0.0.1` instea of `localhost` since some web browsers block navigation to `http://localhost`.
 # Actions
 The plugin allows users to log out or clear the cache to forget all saved accounts. These capabilities are accessible via the "Edit Tag" dialog:
 
