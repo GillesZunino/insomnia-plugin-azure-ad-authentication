@@ -2,6 +2,7 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
+import TokenType from "./TokenType";
 import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid } from "./ValidationUtilities";
 
 
@@ -78,16 +79,16 @@ const Arguments = [{
     displayName: "Token Type",
     description: "Type of token to request",
     help: "Access Token enable clients to securely call protected web APIs. Web APIs use access tokens to authenticate and authorize calls. Id Token carry information about the user and should not be used for authorization purposes",
-    defaultValue: "accessToken",
+    defaultValue: TokenType.accessToken,
     type: "enum",
     options: [{
         displayName: "Access Token",
-        value: "accessToken",
+        value: TokenType.accessToken,
         description: "Securely call web APIs, authenticate and authorize"
     },
     {
         displayName: "Id Token",
-        value: "idToken",
+        value: TokenType.idToken,
         description: "Verify a user is who they claim to be"
     }]
 }

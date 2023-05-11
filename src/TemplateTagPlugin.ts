@@ -4,7 +4,8 @@
 
 import * as msal from "@azure/msal-node";
 
-import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid, isValidTokenType } from "./ValidationUtilities";
+import TokenType from "./TokenType";
+import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid, normalizeTokenType } from "./ValidationUtilities";
 import { getAuthenticationErrorMessageFromException } from "./AzureADUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
@@ -67,10 +68,11 @@ export default class TemplateTagPlugin {
         }
 
         // Token type
+        let normalizedTokenType: TokenType = TokenType.unknown;
         if (!tokenType) {
             throw new Error("'Token Type' property is required");
         }
-        if (!isValidTokenType(tokenType)) {
+        if (!normalizeTokenType(tokenType, normalizedTokenType)) {
             throw new Error("'TokenType' property must be valid");
         }
 
@@ -83,7 +85,7 @@ export default class TemplateTagPlugin {
         try {
             const silentAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateSilent(normalizedScopes);
             if (silentAuthenticationResult) {
-                return silentAuthenticationResult[tokenType]
+                return TemplateTagPlugin.getTokenByType(silentAuthenticationResult, normalizedTokenType);
             }
         }
         catch (e: unknown) {
@@ -95,13 +97,24 @@ export default class TemplateTagPlugin {
         if (this.isSendingRequest(context)) {
             const interactiveAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateInteractive(normalizedScopes, redirectUri);
             if (interactiveAuthenticationResult) {
-                return interactiveAuthenticationResult[tokenType];
+                return TemplateTagPlugin.getTokenByType(interactiveAuthenticationResult, normalizedTokenType);
             } else {
                 throw new Error("Could not retrieve a token from Azure AD - Unspecified error");
             }
         }
 
         return "Send a request to log in";
+    }
+
+    private static getTokenByType(authResult: msal.AuthenticationResult, tokenType: TokenType): string {
+        switch (tokenType) {
+            case TokenType.idToken:
+                return authResult.idToken;
+            case TokenType.accessToken:
+                return authResult.accessToken;
+            default:
+                return "";
+        }
     }
 
     private isSendingRequest(context: any): boolean {

@@ -4,6 +4,7 @@
 
 import { URL } from "url";
 import * as validator from "validator";
+import TokenType from "./TokenType";
 
 export function isTenantIdValid(tenantId: string | null | undefined): boolean {
     if (tenantId) {
@@ -47,11 +48,18 @@ export function isRedirectUriValid(redirectUri: string | null | undefined): bool
     return false;
 }
 
-export function isValidTokenType(tokenType: string | null | undefined): boolean {
-      if (tokenType) {
-        return (tokenType === "accessToken") || (tokenType === "idToken");
-      }
-      return false;
+export function normalizeTokenType(tokenType: string | null | undefined, normalizedTokenType: TokenType): boolean {
+    switch (tokenType) {
+        case TokenType.accessToken:
+            normalizedTokenType = TokenType.accessToken;
+            return true;
+        case TokenType.idToken:
+            normalizedTokenType = TokenType.idToken;
+            return true;
+        default:
+            normalizedTokenType = TokenType.unknown;
+            return false;
+    }
 }
 
 export function normalizeAzureADScopes(scopes: string | null | undefined): string[] {
