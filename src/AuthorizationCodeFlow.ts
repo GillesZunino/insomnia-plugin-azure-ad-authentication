@@ -5,7 +5,7 @@
 import { URL } from "url";
 import { Server } from "http";
 import { ChildProcess } from "child_process";
-import express from "express";
+import * as express from "express";
 import { createHttpTerminator, HttpTerminator } from "http-terminator";
 import * as open from "open";
 import * as msal from "@azure/msal-node";
@@ -36,7 +36,7 @@ export default class AuthorizationCodeFlow {
         if (this.publicClientApplication.instance !== null) {
             const authenticationResultPromiseCompletionSource: PromiseCompletionSource<msal.AuthenticationResult | null> = new PromiseCompletionSource();
 
-            const app: express.Application = express();
+            const app: express.Application = express.default();
 
             app.get("/", async (request, response) => {
                 // Get url to sign user in and consent to scopes needed for application
