@@ -66,12 +66,12 @@ const Arguments = [{
 {
     displayName: "Redirect URI",
     description: "A URI Azure AD will accept as destination when returning authentication responses (tokens) after successfully authenticating users",
-    help: "One of the Redirect URI configured in Azure AD. Examples include 'http://127.0.0.1:1234/redirect' or 'http://127.0.0.1:6090/openid'",
-    defaultValue: "http://127.0.0.1:1234/redirect",
+    help: "One of the Redirect URI configured in Azure AD. Examples include 'http://localhost:1234/redirect' or 'http://localhost:6090/openid'",
+    defaultValue: "http://localhost:1234/redirect",
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
-        return isValid ? "" : "Must be a valid Redirect URI like 'http://127.0.0.1:1234/redirect'. Use 'http://127.0.0.1' as some web browsers prevent navigating to 'http://localhost'";
+        return isValid ? "" : "Must be a valid Redirect URI like 'http://localhost:1234/redirect'. With http, Azure AD requires 'http://localhost'";
     }
 },
 {

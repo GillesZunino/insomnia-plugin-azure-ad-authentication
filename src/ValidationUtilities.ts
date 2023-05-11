@@ -29,9 +29,20 @@ export function isScopesValid(scopes: string | null | undefined): boolean {
 
 export function isRedirectUriValid(redirectUri: string | null | undefined): boolean {
     if (redirectUri) {
-      const parsedRedirectUri: URL = new URL(redirectUri);
-      // Must be HTTP (and not HTTPS), must point to '127.0.0.1', no query string, no hash
-      return (parsedRedirectUri.protocol === "http:") && (parsedRedirectUri.hostname === "127.0.0.1") && (parsedRedirectUri.search === "") && (parsedRedirectUri.hash === "");
+        try {
+            const parsedRedirectUri: URL = new URL(redirectUri);
+            // Must not have a query string, no hash - If HTTP, must be localhost. If HTTPS, can be anything
+            switch (parsedRedirectUri.protocol) {
+                case "http:":
+                    return (parsedRedirectUri.hostname === "localhost") && (parsedRedirectUri.search === "") && (parsedRedirectUri.hash === "");
+                case "https:":
+                    return (parsedRedirectUri.search === "") && (parsedRedirectUri.hash === "");
+                default:
+                    return false;
+            }
+        } catch (e: unknown) {
+            return false;
+        }
     }
     return false;
 }
