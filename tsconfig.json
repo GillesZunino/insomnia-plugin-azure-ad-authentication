@@ -4,7 +4,7 @@
 
 {
     "include": [
-        "src"
+        "src\\index.ts"
     ],
 
     "exclude": [
@@ -18,20 +18,18 @@
     "buildOnSave": false,
 
     "compilerOptions": {
-      "target": "ES2019",
-      "module": "CommonJS",
+      "target": "ES2020",
+      "module": "ES2020",
       "moduleResolution": "node",
+      "importHelpers": false,
       "esModuleInterop": true,
       "sourceMap": true,
-
-      "lib": [
-        "ES2019"
-      ],
 
       "rootDir": "./src",
       "outDir": "./dist",
 
-      "importHelpers": false,
+      "lib": [ "ES2020" ],
+
       "declaration": false,
       "strict": true,
       "noImplicitAny": true,
@@ -42,11 +40,10 @@
       "alwaysStrict": true,
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
-      "resolveJsonModule": true,
-      "suppressImplicitAnyIndexErrors": true,
-      "experimentalDecorators": true,
 
       "noUnusedLocals": false,
-      "noUnusedParameters": false
+      "noUnusedParameters": false,
+
+      "removeComments": false
     }
   }
