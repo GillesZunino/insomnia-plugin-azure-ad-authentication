@@ -77,9 +77,10 @@ export default class AuthorizationCodeFlow {
                     // Redeem the code for an authentication result
                     if (this.publicClientApplication.instance !== null) {
                         try {
+                            // Retrieve results - This may fail so we do not yet send a response to the client
+                            const authenticationResult: msal.AuthenticationResult | null = await this.publicClientApplication.instance.acquireTokenByCode(tokenRequest);
                             response.status(200).send(SuccessHtml).end();
 
-                            const authenticationResult: msal.AuthenticationResult | null = await this.publicClientApplication.instance.acquireTokenByCode(tokenRequest);
                             authenticationResultPromiseCompletionSource.resolve(authenticationResult);
                         }
                         catch (e: unknown) {
