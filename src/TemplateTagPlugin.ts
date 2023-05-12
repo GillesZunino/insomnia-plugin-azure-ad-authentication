@@ -68,11 +68,11 @@ export default class TemplateTagPlugin {
         }
 
         // Token type
-        let normalizedTokenType: TokenType = TokenType.unknown;
         if (!tokenType) {
             throw new Error("'Token Type' property is required");
         }
-        if (!normalizeTokenType(tokenType, normalizedTokenType)) {
+        const {outcome, normalizedTokenType } = normalizeTokenType(tokenType);
+        if (!outcome) {
             throw new Error("'TokenType' property must be valid");
         }
 

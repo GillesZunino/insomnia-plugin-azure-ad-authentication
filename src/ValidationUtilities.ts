@@ -48,17 +48,14 @@ export function isRedirectUriValid(redirectUri: string | null | undefined): bool
     return false;
 }
 
-export function normalizeTokenType(tokenType: string | null | undefined, normalizedTokenType: TokenType): boolean {
+export function normalizeTokenType(tokenType: string | null | undefined): { outcome: boolean, normalizedTokenType: TokenType} {
     switch (tokenType) {
         case TokenType.accessToken:
-            normalizedTokenType = TokenType.accessToken;
-            return true;
+            return { outcome: true, normalizedTokenType: TokenType.accessToken };
         case TokenType.idToken:
-            normalizedTokenType = TokenType.idToken;
-            return true;
+            return { outcome: true, normalizedTokenType: TokenType.idToken };
         default:
-            normalizedTokenType = TokenType.unknown;
-            return false;
+            return { outcome: false, normalizedTokenType: TokenType.unknown };
     }
 }
 
