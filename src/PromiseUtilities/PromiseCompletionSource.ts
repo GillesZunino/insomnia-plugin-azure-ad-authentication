@@ -2,7 +2,7 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-export class PromiseCompletionSource<T> {
+export default class PromiseCompletionSource<T> {
     private internalPromise: Promise<T>;
     private internalResolve: (value: T | PromiseLike<T>) => void;
     private internalReject: (reason?: any) => void;

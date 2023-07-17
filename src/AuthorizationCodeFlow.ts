@@ -6,14 +6,14 @@ import { URL } from "url";
 import { Server } from "http";
 import { ChildProcess } from "child_process";
 import * as express from "express";
-import { createHttpTerminator, HttpTerminator } from "http-terminator";
 import * as open from "open";
 import * as msal from "@azure/msal-node";
 
+import HttpTerminator from "./HttpTerminator/HttpTerminator";
 import { SuccessHtml } from "./AuthSuccessHtml"
 import { FailedHtml } from "./AuthFailureHtml"
 
-import { PromiseCompletionSource } from "./PromiseCompletionSource";
+import PromiseCompletionSource from "./PromiseUtilities/PromiseCompletionSource";
 import { getAuthenticationErrorMessageFromException } from "./AzureADUtilities";
 import AzureADClientApplication from "./AzureADClientApplication";
 
@@ -111,7 +111,7 @@ export default class AuthorizationCodeFlow {
             try {
                 // Listen for requests
                 server = app.listen(redirectPort, () => console.log(`Listening on port ${redirectPort}`));
-                httpConnectionsTerminator = createHttpTerminator({ server: server, gracefulTerminationTimeout: 1000 });
+                httpConnectionsTerminator = new HttpTerminator(server, { gracefulTerminationTimeout: 1000 });
 
                 // Open the user's default web browser and navigate it to the redirect uri (aka '/' handler above)
                 browserProcess = await open.default(redirectBaseUri);
@@ -122,7 +122,7 @@ export default class AuthorizationCodeFlow {
             finally {
                 if (httpConnectionsTerminator) {
                     // Force the Http server to stop listening for connection and close all currently established ones
-                    await httpConnectionsTerminator.terminate();
+                    await httpConnectionsTerminator.terminateAsync();
                     httpConnectionsTerminator = null;
                     server = null;
                 }
