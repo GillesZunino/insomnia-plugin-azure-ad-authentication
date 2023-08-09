@@ -62,6 +62,7 @@
     "@types/express": "4.17.17",
     "@types/node": "20.4.1",
     "@types/validator": "13.7.17",
+    "eslint-plugin-node": "11.1.0",
     "clean-webpack-plugin": "4.0.0",
     "terser-webpack-plugin": "5.3.9",
     "ts-loader": "9.4.4",
