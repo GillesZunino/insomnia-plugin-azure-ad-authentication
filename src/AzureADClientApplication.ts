@@ -87,7 +87,7 @@ export default class AzureADClientApplication {
                 }
             }
         }
-        catch (e) {
+        catch (e: unknown) {
             this.currentAuthenticationResult = null;
             await this.removeSavedAccountId();
             throw e;
@@ -112,7 +112,7 @@ export default class AzureADClientApplication {
                             scopes: scopes
                         });
                     }
-                    catch (e) {
+                    catch (e: unknown) {
                         this.currentAuthenticationResult = null;
                         throw e;
                     }
