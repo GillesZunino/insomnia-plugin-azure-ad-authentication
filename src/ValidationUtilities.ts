@@ -5,6 +5,7 @@
 import { URL } from "url";
 import * as validator from "validator";
 import TokenType from "./TokenType";
+import TokenGrantFlow from "./TokenGrantFlow";
 
 export function isTenantIdValid(tenantId: string | null | undefined): boolean {
     if (tenantId) {
@@ -48,14 +49,27 @@ export function isRedirectUriValid(redirectUri: string | null | undefined): bool
     return false;
 }
 
-export function normalizeTokenType(tokenType: string | null | undefined): { outcome: boolean, normalizedTokenType: TokenType} {
+export function normalizeTokenType(tokenType: string | null | undefined): { tokenTypeValid: boolean, normalizedTokenType: TokenType} {
     switch (tokenType) {
         case TokenType.accessToken:
-            return { outcome: true, normalizedTokenType: TokenType.accessToken };
+            return { tokenTypeValid: true, normalizedTokenType: TokenType.accessToken };
         case TokenType.idToken:
-            return { outcome: true, normalizedTokenType: TokenType.idToken };
+            return { tokenTypeValid: true, normalizedTokenType: TokenType.idToken };
         default:
-            return { outcome: false, normalizedTokenType: TokenType.unknown };
+            return { tokenTypeValid: false, normalizedTokenType: TokenType.unknown };
+    }
+}
+
+export function normalizeTokenGrantFlow(tokenGrantFlow: string | null | undefined): { tokenGrantFlowValid: boolean, normalizedTokenGrantFlow: TokenGrantFlow} {  
+    switch (tokenGrantFlow) {
+        case TokenGrantFlow.oauth2AuthorizationCode:
+            return { tokenGrantFlowValid: true, normalizedTokenGrantFlow: TokenGrantFlow.oauth2AuthorizationCode };
+        case TokenGrantFlow.oauth2ClientCredentialsPSK:
+            return { tokenGrantFlowValid: true, normalizedTokenGrantFlow: TokenGrantFlow.oauth2ClientCredentialsPSK };
+        case TokenGrantFlow.oauth2ClientCredentialsCertificate:
+            return { tokenGrantFlowValid: true, normalizedTokenGrantFlow: TokenGrantFlow.oauth2ClientCredentialsCertificate };
+        default:
+            return { tokenGrantFlowValid: false, normalizedTokenGrantFlow: TokenGrantFlow.unknown };
     }
 }
 
