@@ -3,10 +3,11 @@
 // -----------------------------------------------------------------------------------
 
 import TokenType from "./TokenType";
-import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid } from "./ValidationUtilities";
+import TokenGrantFlow from "./TokenGrantFlow";
+import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
 
 
-const Arguments = [{
+const TemplateTagPluginArguments = [{
     displayName: "Authority",
     description: "Azure AD Authority",
     help: "Azure AD endpoint to use when retrieving tokens",
@@ -76,11 +77,84 @@ const Arguments = [{
     }
 },
 {
+    displayName: "Token Grant Flow",
+    description: "Authentication flow for requesting tokens",
+    help: "Authentication flow - See https://learn.microsoft.com/en-us/azure/active-directory/develop/authentication-flows-app-scenarios#scenarios-and-supported-authentication-flows",
+    defaultValue: TokenGrantFlow.oauth2AuthorizationCode,
+    type: "enum",
+    options: [{
+        displayName: "OAuth 2.0 Auth Code grant with PKCE",
+        value: TokenGrantFlow.oauth2AuthorizationCode,
+        description: "Authenticate interactively with Web Browser"
+    },
+    {
+        displayName: "OAuth 2.0 Client Credential grant with Shared Secret",
+        value: TokenGrantFlow.oauth2ClientCredentialsPSK,
+        description: "Authenticate silently with shared secret (not recommended)"
+    },
+    {
+        displayName: "OAuth 2.0 Client Credential grant with Certificate",
+        value: TokenGrantFlow.oauth2ClientCredentialsCertificate,
+        description: "Authenticate silently with signed client assertion"
+    }]
+},
+{
+    displayName: "Shared secret",
+    description: "Shared secret to present",
+    help: "Shared secret that you generated for your app - https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#first-case-access-token-request-with-a-shared-secret",
+    defaultValue: "",
+    type: "string",
+    validate: (arg: any): string => {
+        return arg ? "" : "Must be a non empty string";
+    },
+    hide: (args: any[]): boolean => {
+        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+                !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
+                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsPSK);
+    }
+},
+{
+    displayName: "Certificate Thumbprint",
+    description: "Thumbprint of certificate registered with Azure AD",
+    help: "Thumbprint of certificate registered with Azure AD",
+    defaultValue: "",
+    type: "string",
+    validate: (arg: any): string => {
+        if (!arg) {
+            return "Must be a non empty string";
+        }
+        return isCertificateThumbprintSyntacticallyValid(arg) ? "" : "Must contain only numbers and/or letters from A to Z";
+    },
+    hide: (args: any[]): boolean => {
+        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+                !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
+                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsCertificate);
+    }
+},
+{
+    displayName: "Certificate Private Key",
+    description: "Certificate private key n PEM format",
+    help: "Certificate to sign the client assertion - See https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#second-case-access-token-request-with-a-certificate",
+    defaultValue: "",
+    type: "file",
+    extensions: [ "pem", "key" ],
+    hide: (args: any[]): boolean => {
+        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+        !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
+        (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsCertificate);
+    }
+},
+{
     displayName: "Token Type",
     description: "Type of token to request",
     help: "Access Token enable clients to securely call protected web APIs. Web APIs use access tokens to authenticate and authorize calls. Id Token carry information about the user and should not be used for authorization purposes",
     defaultValue: TokenType.accessToken,
     type: "enum",
+    hide: (args: any[]): boolean => {
+        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+        !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
+        (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2AuthorizationCode);
+    },
     options: [{
         displayName: "Access Token",
         value: TokenType.accessToken,
@@ -91,7 +165,33 @@ const Arguments = [{
         value: TokenType.idToken,
         description: "Verify a user is who they claim to be"
     }]
-}
-];
+}];
 
-export { Arguments }
+
+
+function getArgumentIndexByDisplayName(displayName: string): number {
+    const index: number = TemplateTagPluginArguments.findIndex((templateTagPluginArgument: any) => templateTagPluginArgument.displayName === displayName);
+    if (index !== -1) {
+        return index;
+    } else {
+        throw new Error(`Cannot initialize TemplaterTagPluginArguments - Argument '${displayName}' cannot be found`);
+    }
+}
+
+
+const TemplatePluginArgumentsPosition = {
+    Authority: getArgumentIndexByDisplayName("Authority"),
+    TenantId: getArgumentIndexByDisplayName("Directory (tenant) ID"),
+    ClientId: getArgumentIndexByDisplayName("Application (client) ID"),
+    Scopes: getArgumentIndexByDisplayName("Scopes"),
+    RedirectUri: getArgumentIndexByDisplayName("Redirect URI"),
+    TokenGrantFlow: getArgumentIndexByDisplayName("Token Grant Flow"),
+    SharedSecret: getArgumentIndexByDisplayName("Shared secret"),
+    CertificateThumbprint: getArgumentIndexByDisplayName("Certificate Thumbprint"),
+    CertificatePrivateKey: getArgumentIndexByDisplayName("Certificate Private Key"),
+    TokenType: getArgumentIndexByDisplayName("Token Type")
+}
+
+
+
+export { TemplateTagPluginArguments, TemplatePluginArgumentsPosition }

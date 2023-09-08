@@ -5,6 +5,7 @@
 import * as msal from "@azure/msal-node";
 
 import InsomniaPersistencePlugin from "./InsomniaPersistencePlugin";
+import AzureADApplicationOptions from "./AzureADApplicationOptions"
 import AuthorizationCodeFlow from "./AuthorizationCodeFlow";
 
 export default class AzureADClientApplication {
@@ -12,23 +13,23 @@ export default class AzureADClientApplication {
     private static readonly LastHomeAccountIdKey: string = "LastHomeAccountId";
 
     private clientConfig: msal.Configuration;
-    private publicClientApplication: msal.PublicClientApplication | null;
+    private clientApplication: msal.PublicClientApplication | msal.ConfidentialClientApplication | null;
     private insomniaStore: any | null;
 
     private currentAuthenticationResult: msal.AuthenticationResult | null;
 
     public get authenticationResult(): msal.AuthenticationResult | null { return this.currentAuthenticationResult; }
-    public get instance(): msal.PublicClientApplication | null { return this.publicClientApplication; }
+    public get instance(): msal.PublicClientApplication | msal.ConfidentialClientApplication | null { return this.clientApplication; }
 
     public constructor() {
-        // Store
+        // Insomnia store
         this.insomniaStore = null;
 
         // Last successful authentication result
         this.currentAuthenticationResult = null;
 
         // Azure AD application configuration
-        this.publicClientApplication = null;
+        this.clientApplication = null;
         this.clientConfig = {
             auth: {
                 clientId: "",
@@ -56,25 +57,45 @@ export default class AzureADClientApplication {
         }
     }
 
-    public async configure(authority: string, tenantId: string, clientId: string): Promise<boolean> {
-        const tenantedAuthority: string = this.getTenantedAuthority(authority, tenantId);
-        const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== clientId);
+    public async configure(options: AzureADApplicationOptions): Promise<boolean> {
+        const tenantedAuthority: string = this.getTenantedAuthority(options.authority, options.tenantId);
+        const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== options.clientId) ||
+                                              (this.clientConfig.auth.clientSecret !== options.clientSecret) ||
+                                              (this.clientConfig.auth.clientCertificate?.privateKey !== options.clientCertificate?.privateKey) || (this.clientConfig.auth.clientCertificate?.thumbprint !== options.clientCertificate?.thumbprint);
         if (configurationChanged) {
             // Assume we can restore a previous session if we receive configuration for the first time - Otherwise, log the current user out
             if (this.clientConfig.auth.authority || this.clientConfig.auth.clientId) {
-                await this.signOut();
+                await this.signOutAsync();
             }
 
             // Reconfigure the application
-            this.clientConfig.auth.clientId = clientId;
+            this.clientConfig.auth.clientId = options.clientId;
             this.clientConfig.auth.authority = tenantedAuthority;
-            this.publicClientApplication = new msal.PublicClientApplication(this.clientConfig);
+
+            // Decide which style of application we will need
+            if (!!options.clientCertificate || !!options.clientSecret) {
+                // Confidential application - Shared Secret or Certificate but not both
+
+                // Reset configuration and apply new values
+                this.clientConfig.auth.clientSecret = undefined;
+                this.clientConfig.auth.clientCertificate = undefined;
+                if (options.clientSecret) {
+                    this.clientConfig.auth.clientSecret = options.clientSecret;
+                }
+                if (options.clientCertificate) {
+                    this.clientConfig.auth.clientCertificate = options.clientCertificate;
+                }
+                this.clientApplication = new msal.ConfidentialClientApplication(this.clientConfig);
+            } else {
+                // Public application
+                this.clientApplication = new msal.PublicClientApplication(this.clientConfig);
+            }
         }
 
         return configurationChanged;
     }
 
-    public async authenticateInteractive(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
+    public async authenticateInteractiveAsync(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
         try {
             const authorizationCodeFlow: AuthorizationCodeFlow = new AuthorizationCodeFlow(this);
             this.currentAuthenticationResult = await authorizationCodeFlow.authenticateInteractive(scopes, redirectUri);
@@ -96,7 +117,7 @@ export default class AzureADClientApplication {
         return this.currentAuthenticationResult;
     }
 
-    public async authenticateSilent(scopes: string[]): Promise<msal.AuthenticationResult | null> {
+    public async authenticateSilentAsync(scopes: string[]): Promise<msal.AuthenticationResult | null> {
         if (this.instance) {
             const savedHomeAccountId: string | null = this.authenticationResult?.account?.homeAccountId ? this.authenticationResult?.account?.homeAccountId : await this.getSavedAccountId();
             if (savedHomeAccountId) {
@@ -123,7 +144,25 @@ export default class AzureADClientApplication {
         return this.currentAuthenticationResult;
     }
 
-    public async signOut(): Promise<void> {
+    public async authenticateWithClientCredentialsAsync(scopes: string[], clientAssertion?: string): Promise<msal.AuthenticationResult | null> {
+        if (this.instance) {
+            try {
+                let clientCredentialRequest: msal.ClientCredentialRequest = { scopes: scopes };
+                if (clientAssertion) {
+                    clientCredentialRequest.clientAssertion = clientAssertion;
+                }
+                this.currentAuthenticationResult = await (<msal.ConfidentialClientApplication> this.instance).acquireTokenByClientCredential(clientCredentialRequest);
+            }
+            catch (e: unknown) {
+                this.currentAuthenticationResult = null;
+                throw e;
+            }
+        }
+
+        return this.currentAuthenticationResult;
+    }
+
+    public async signOutAsync(): Promise<void> {
         if (this.instance) {
             if (this.currentAuthenticationResult?.account) {
                 const tokenCache: msal.TokenCache = this.instance?.getTokenCache();
@@ -135,8 +174,8 @@ export default class AzureADClientApplication {
         this.currentAuthenticationResult = null;
     }
 
-    public async clearCache(): Promise<void> {
-        await this.signOut();
+    public async clearCacheAsync(): Promise<void> {
+        await this.signOutAsync();
 
         const tokenCache: msal.TokenCache | undefined = this.instance?.getTokenCache();
         if (tokenCache) {

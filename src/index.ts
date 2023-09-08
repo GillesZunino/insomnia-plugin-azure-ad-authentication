@@ -4,7 +4,7 @@
 
 import AzureADClientApplication from "./AzureADClientApplication";
 
-import { Arguments } from "./TemplateTagArguments";
+import { TemplateTagPluginArguments } from "./TemplateTagArguments";
 import TemplateTagActions from "./TemplateTagActions";
 import TemplateTagLiveDisplayName from "./TemplateTagLiveDisplayName";
 import TemplateTagPlugin from "./TemplateTagPlugin";
@@ -23,7 +23,7 @@ const templateTags = [{
   displayName: "Azure AD Token",
   description: "Get an Azure AD access token",
 
-  args: Arguments,
+  args: TemplateTagPluginArguments,
   actions: templateTagActions.getActions(),
 
   liveDisplayName: (args: any[]): string | null => templateTagLiveDisplayName.liveDisplayName(args),

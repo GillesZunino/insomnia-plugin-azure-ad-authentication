@@ -16,12 +16,12 @@ export default class TemplateTagActions {
       {
         name: "Sign out",
         icon: "fa fa-sign-out",
-        run: (context: any) => this.azureAdClientApplication.signOut()
+        run: (context: any) => this.azureAdClientApplication.signOutAsync()
       },
       {
         name: "Clear Azure AD cache",
         icon: "fa fa-trash",
-        run: (context: any) => this.azureAdClientApplication.clearCache()
+        run: (context: any) => this.azureAdClientApplication.clearCacheAsync()
       }
     ];
   }
