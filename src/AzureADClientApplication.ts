@@ -41,7 +41,7 @@ export default class AzureADClientApplication {
                     loggerCallback(level: msal.LogLevel, message: string, containsPii: boolean): void {
                         console.log(message);
                     },
-                    piiLoggingEnabled: true,
+                    piiLoggingEnabled: false,
                     logLevel: msal.LogLevel.Error
                 }
             }
