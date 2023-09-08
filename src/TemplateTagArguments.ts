@@ -57,7 +57,15 @@ const TemplateTagPluginArguments = [{
 {
     displayName: "Scopes",
     description: "Scopes to request the Azure AD token for, separated by space",
-    help: "A space separated list of resources to request the token for. Examples include 'User.Read' or 'openid profile'",
+    help: (args: any[]): string => {
+        const isClientCredentialFlow: boolean = 
+                (args.length >= TemplatePluginArgumentsPosition.TokenGrantFlow + 1) &&
+                !!args[TemplatePluginArgumentsPosition.TokenGrantFlow] && 
+                ((args[TemplatePluginArgumentsPosition.TokenGrantFlow].value === TokenGrantFlow.oauth2ClientCredentialsPSK) || (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value === TokenGrantFlow.oauth2ClientCredentialsCertificate));
+        return isClientCredentialFlow ? 
+            "For Client Credential flows, scope must be '<application URI>/.default' where <app URI. is the application URI" :
+            "A space separated list of resources to request the token for. Examples include 'User.Read' or 'openid profile'";
+    },
     defaultValue: "openid profile offline_access",
     type: "string",
     validate: (arg: any): string => {
