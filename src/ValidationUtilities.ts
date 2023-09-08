@@ -82,3 +82,7 @@ export function normalizeAzureADScopes(scopes: string | null | undefined): strin
       return [];
     }
 }
+
+export function isCertificateThumbprintSyntacticallyValid(thumbprint: string): boolean {
+    return !!thumbprint && (thumbprint.length === 40) && (thumbprint.match(/^[0-9a-fA-F]+$/) ? true : false);
+}
