@@ -107,7 +107,7 @@ const TemplateTagPluginArguments = [{
     }]
 },
 {
-    displayName: "Shared secret",
+    displayName: "Shared Secret",
     description: "Shared secret to present",
     help: "Shared secret that you generated for your app - https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#first-case-access-token-request-with-a-shared-secret",
     defaultValue: "",
@@ -194,7 +194,7 @@ const TemplatePluginArgumentsPosition = {
     Scopes: getArgumentIndexByDisplayName("Scopes"),
     RedirectUri: getArgumentIndexByDisplayName("Redirect URI"),
     TokenGrantFlow: getArgumentIndexByDisplayName("Token Grant Flow"),
-    SharedSecret: getArgumentIndexByDisplayName("Shared secret"),
+    SharedSecret: getArgumentIndexByDisplayName("Shared Secret"),
     CertificateThumbprint: getArgumentIndexByDisplayName("Certificate Thumbprint"),
     CertificatePrivateKey: getArgumentIndexByDisplayName("Certificate Private Key"),
     TokenType: getArgumentIndexByDisplayName("Token Type")
