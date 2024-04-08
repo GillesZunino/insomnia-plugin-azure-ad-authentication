@@ -33,7 +33,13 @@ export function isRedirectUriValid(redirectUri: string | null | undefined): bool
     if (redirectUri) {
         try {
             const parsedRedirectUri: URL = new URL(redirectUri);
-            // Must not have a query string, no hash - If HTTP, must be localhost. If HTTPS, can be anything
+
+            // Explicitely reject 'Postman callback' style URLs. We do not currently support these
+            if (parsedRedirectUri.hostname.endsWith("pstmn.io")) {
+                return false;
+            }
+
+            // Must not have a query string, no hash - If HTTP, must be localhost
             switch (parsedRedirectUri.protocol) {
                 case "http:":
                     return (parsedRedirectUri.hostname === "localhost") && (parsedRedirectUri.search === "") && (parsedRedirectUri.hash === "");

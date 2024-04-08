@@ -43,7 +43,7 @@ This plugin **requires** the Redirect URI specified during step 5 above to be co
 
    ![Azure AD Redirect URIs](images/AzureAD-Mobile-Desktop-ReturnUri.png)
 
-For web browser token grant flows, it is best to choose a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
+For web browser token grant flows, it is best to choose a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`. Postman style callback URLs (aka `https://oauth.pstmn.io/v1/callback` and variants) are not currently supported. See [Issue #10 - Error: RangeError: options.port should be >= 0 and < 65536. Received type number (NaN).](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/10). 
 
 ## Configure for Shared Secret or Certificate authentication
 Azure AD applications can authenticate as themselves wihtou any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Azure AD documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)

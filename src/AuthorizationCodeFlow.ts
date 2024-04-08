@@ -25,11 +25,26 @@ export default class AuthorizationCodeFlow {
     }
 
     public async authenticateInteractive(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
-        // Derive port, redirect path and base uri from the redirect uri given
+        // Derive protocol, redirect path, base uri and port from the redirect uri given
         const parsedRedirectUri: URL = new URL(redirectUri);
-        const redirectPort: number = parseInt(parsedRedirectUri.port);
+        const redirectProtocol: string = parsedRedirectUri.protocol;
         const redirectPath: string = `${parsedRedirectUri.pathname}`;
-        const redirectBaseUri: string = `${parsedRedirectUri.protocol}//${parsedRedirectUri.host}`;
+        const redirectBaseUri: string = `${redirectProtocol}//${parsedRedirectUri.host}`;
+
+        // Parse port by defaulting to 80 or 443 if not present
+        let redirectPort: number = parseInt(parsedRedirectUri.port);
+        if (isNaN(redirectPort)) {
+            switch (redirectProtocol) {
+                case "http:":
+                    redirectPort = 80;
+                    break;
+                case "https:":
+                    redirectPort = 443;
+                    break;
+                default:
+                    throw new Error(`Unsupported protocol: ${redirectProtocol}`);
+            }
+        }
 
         let authenticationResult: msal.AuthenticationResult | null = null;
 

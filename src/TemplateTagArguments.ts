@@ -76,12 +76,12 @@ const TemplateTagPluginArguments = [{
 {
     displayName: "Redirect URI",
     description: "A URI Azure AD will accept as destination when returning authentication responses (tokens) after successfully authenticating users",
-    help: "One of the Redirect URI configured in Azure AD. Examples include 'http://localhost:1234/redirect' or 'http://localhost:6090/openid'",
+    help: "One of the Redirect URI configured in Azure AD. Examples include 'http://localhost:1234/redirect' or 'http://localhost:6090/openid'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.",
     defaultValue: "http://localhost:1234/redirect",
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
-        return isValid ? "" : "Must be a valid Redirect URI like 'http://localhost:1234/redirect'. With http, Azure AD requires 'http://localhost'";
+        return isValid ? "" : "Must be a valid Redirect URI like 'http://localhost:1234/redirect'. With http, Azure AD requires 'http://localhost'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.";
     }
 },
 {
