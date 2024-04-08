@@ -2,13 +2,13 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-import AzureADClientApplication from "./AzureADClientApplication";
+import EntraIdClientApplication from "./EntraIdClientApplication";
 
 export default class TemplateTagActions {
-  private azureAdClientApplication: AzureADClientApplication;
+  private entraIdClientApplication: EntraIdClientApplication;
 
-  public constructor(azureAdClientApplication: AzureADClientApplication) {
-    this.azureAdClientApplication = azureAdClientApplication;
+  public constructor(entraIdClientApplication: EntraIdClientApplication) {
+    this.entraIdClientApplication = entraIdClientApplication;
   }
 
   public getActions(): any[] {
@@ -16,12 +16,12 @@ export default class TemplateTagActions {
       {
         name: "Sign out",
         icon: "fa fa-sign-out",
-        run: (context: any) => this.azureAdClientApplication.signOutAsync()
+        run: (context: any) => this.entraIdClientApplication.signOutAsync()
       },
       {
-        name: "Clear Azure AD cache",
+        name: "Clear Entra ID cache",
         icon: "fa fa-trash",
-        run: (context: any) => this.azureAdClientApplication.clearCacheAsync()
+        run: (context: any) => this.entraIdClientApplication.clearCacheAsync()
       }
     ];
   }

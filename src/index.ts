@@ -2,7 +2,7 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-import AzureADClientApplication from "./AzureADClientApplication";
+import EntraIdClientApplication from "./EntraIdClientApplication";
 
 import { TemplateTagPluginArguments } from "./TemplateTagArguments";
 import TemplateTagActions from "./TemplateTagActions";
@@ -10,18 +10,18 @@ import TemplateTagLiveDisplayName from "./TemplateTagLiveDisplayName";
 import TemplateTagPlugin from "./TemplateTagPlugin";
 
 
-const azureAdClientApplication: AzureADClientApplication = new AzureADClientApplication();
-const templateTagActions: TemplateTagActions = new TemplateTagActions(azureAdClientApplication);
-const templateTagLiveDisplayName: TemplateTagLiveDisplayName = new TemplateTagLiveDisplayName(azureAdClientApplication);
-const templateTagPlugin: TemplateTagPlugin = new TemplateTagPlugin(azureAdClientApplication);
+const entraIdClientApplication: EntraIdClientApplication = new EntraIdClientApplication();
+const templateTagActions: TemplateTagActions = new TemplateTagActions(entraIdClientApplication);
+const templateTagLiveDisplayName: TemplateTagLiveDisplayName = new TemplateTagLiveDisplayName(entraIdClientApplication);
+const templateTagPlugin: TemplateTagPlugin = new TemplateTagPlugin(entraIdClientApplication);
 
 
 
 
 const templateTags = [{
   name: "azuread",
-  displayName: "Azure AD Token",
-  description: "Get an Azure AD access token",
+  displayName: "Entra ID Token",
+  description: "Get a Microsoft Entra ID token",
 
   args: TemplateTagPluginArguments,
   actions: templateTagActions.getActions(),

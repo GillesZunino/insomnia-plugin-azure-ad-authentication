@@ -3,24 +3,24 @@
 // -----------------------------------------------------------------------------------
 
 import { AuthenticationResult } from "@azure/msal-common";
-import AzureADClientApplication from "./AzureADClientApplication";
+import EntraIdClientApplication from "./EntraIdClientApplication";
 
 
 export default class TagTemplateLiveDisplayName {
     private static readonly HtmlArrow: string = "&rArr;";
 
-    private azureAdClientApplication: AzureADClientApplication;
+    private entraIdClientApplication: EntraIdClientApplication;
 
-    public constructor(azureAdClientApplication: AzureADClientApplication) {
-        this.azureAdClientApplication = azureAdClientApplication;
+    public constructor(entraIdClientApplication: EntraIdClientApplication) {
+        this.entraIdClientApplication = entraIdClientApplication;
     }
 
     public liveDisplayName(args: any[]): string | null {
-        const currentAuthenticationResult: AuthenticationResult | null = this.azureAdClientApplication.authenticationResult;
+        const currentAuthenticationResult: AuthenticationResult | null = this.entraIdClientApplication.authenticationResult;
         if (currentAuthenticationResult) {
-            return `Azure AD ${TagTemplateLiveDisplayName.HtmlArrow} [${currentAuthenticationResult.account?.username} - '${currentAuthenticationResult.scopes}']`;
+            return `Entra ID ${TagTemplateLiveDisplayName.HtmlArrow} [${currentAuthenticationResult.account?.username} - '${currentAuthenticationResult.scopes}']`;
         } else {
-            return `Azure AD ${TagTemplateLiveDisplayName.HtmlArrow} Not logged in [${args[0].value}]`;
+            return `Entra ID ${TagTemplateLiveDisplayName.HtmlArrow} Not logged in [${args[0].value}]`;
         }
     }
 }

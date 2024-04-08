@@ -23,7 +23,7 @@ export function isClientIdValid(clientId: string | null | undefined): boolean {
 
 export function isScopesValid(scopes: string | null | undefined): boolean {
     if (scopes) {
-        const normalizedScopes: string[] = normalizeAzureADScopes(scopes);
+        const normalizedScopes: string[] = normalizeEntraIdScopes(scopes);
         return normalizedScopes.length > 0;
     }
     return false;
@@ -79,7 +79,7 @@ export function normalizeTokenGrantFlow(tokenGrantFlow: string | null | undefine
     }
 }
 
-export function normalizeAzureADScopes(scopes: string | null | undefined): string[] {
+export function normalizeEntraIdScopes(scopes: string | null | undefined): string[] {
     if (scopes) {
       return scopes.split(" ")
                    .map((entry: string) => entry ? entry.trim() : "")

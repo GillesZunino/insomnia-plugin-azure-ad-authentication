@@ -14,13 +14,13 @@ import { SuccessHtml } from "./AuthSuccessHtml"
 import { FailedHtml } from "./AuthFailureHtml"
 
 import PromiseCompletionSource from "./PromiseUtilities/PromiseCompletionSource";
-import { getAuthenticationErrorMessageFromException } from "./AzureADUtilities";
-import AzureADClientApplication from "./AzureADClientApplication";
+import { getAuthenticationErrorMessageFromException } from "./EntraIdUtilities";
+import EntraIdClientApplication from "./EntraIdClientApplication";
 
 export default class AuthorizationCodeFlow {
-    private publicClientApplication: AzureADClientApplication;
+    private publicClientApplication: EntraIdClientApplication;
 
-    public constructor(publicClientApplication: AzureADClientApplication) {
+    public constructor(publicClientApplication: EntraIdClientApplication) {
         this.publicClientApplication = publicClientApplication;
     }
 
@@ -72,7 +72,7 @@ export default class AuthorizationCodeFlow {
                         authenticationResultPromiseCompletionSource.reject(e);
                     }
                 } else {
-                    const message: string = "Azure AD Public Client Application was not initialized properly";
+                    const message: string = "Entra ID Public Client Application was not initialized properly";
                     const error: Error = new Error(message);
                     response.status(200).send(this.formatErrorHtml(message)).end();
                     authenticationResultPromiseCompletionSource.reject(error);
@@ -118,7 +118,7 @@ export default class AuthorizationCodeFlow {
             });
 
 
-            // Trigger the authentication flow: Open the default browser, point it to '/'. This starts the Azure AD Authorization Code flow
+            // Trigger the authentication flow: Open the default browser, point it to '/'. This starts the Entra AD Authorization Code flow
             let server: Server | null = null;
             let httpConnectionsTerminator: HttpTerminator | null = null;
             let browserProcess: ChildProcess | null = null;

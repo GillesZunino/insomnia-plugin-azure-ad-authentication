@@ -5,10 +5,10 @@
 import * as msal from "@azure/msal-node";
 
 import InsomniaPersistencePlugin from "./InsomniaPersistencePlugin";
-import AzureADApplicationOptions from "./AzureADApplicationOptions"
+import EntraIdApplicationOptions from "./EntraIdApplicationOptions";
 import AuthorizationCodeFlow from "./AuthorizationCodeFlow";
 
-export default class AzureADClientApplication {
+export default class EntraIdClientApplication {
 
     private static readonly LastHomeAccountIdKey: string = "LastHomeAccountId";
 
@@ -28,7 +28,7 @@ export default class AzureADClientApplication {
         // Last successful authentication result
         this.currentAuthenticationResult = null;
 
-        // Azure AD application configuration
+        // Micrtosoft Entra ID application configuration
         this.clientApplication = null;
         this.clientConfig = {
             auth: {
@@ -57,7 +57,7 @@ export default class AzureADClientApplication {
         }
     }
 
-    public async configure(options: AzureADApplicationOptions): Promise<boolean> {
+    public async configure(options: EntraIdApplicationOptions): Promise<boolean> {
         const tenantedAuthority: string = this.getTenantedAuthority(options.authority, options.tenantId);
         const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== options.clientId) ||
                                               (this.clientConfig.auth.clientSecret !== options.clientSecret) ||
@@ -180,26 +180,26 @@ export default class AzureADClientApplication {
         const tokenCache: msal.TokenCache | undefined = this.instance?.getTokenCache();
         if (tokenCache) {
             const allCachedAccounts: msal.AccountInfo[] = await tokenCache.getAllAccounts();
-            allCachedAccounts.forEach((accountInfo: msal.AccountInfo) => {
+            allCachedAccounts.forEach((accountInfo: msal.AccountInfo) => {``
                 tokenCache.removeAccount(accountInfo);
             });
         }
     }
 
     private async getSavedAccountId(): Promise<string | null> {
-        if (await this.insomniaStore.hasItem(AzureADClientApplication.LastHomeAccountIdKey)) {
-            return await this.insomniaStore.getItem(AzureADClientApplication.LastHomeAccountIdKey);
+        if (await this.insomniaStore.hasItem(EntraIdClientApplication.LastHomeAccountIdKey)) {
+            return await this.insomniaStore.getItem(EntraIdClientApplication.LastHomeAccountIdKey);
         } else {
             return null;
         }
     }
 
     private async setSavedAccountId(accountId: string): Promise<void> {
-        return this.insomniaStore.setItem(AzureADClientApplication.LastHomeAccountIdKey, accountId);
+        return this.insomniaStore.setItem(EntraIdClientApplication.LastHomeAccountIdKey, accountId);
     }
 
     private async removeSavedAccountId(): Promise<void> {
-        return this.insomniaStore.removeItem(AzureADClientApplication.LastHomeAccountIdKey);
+        return this.insomniaStore.removeItem(EntraIdClientApplication.LastHomeAccountIdKey);
     }
 
     private getTenantedAuthority(authority: string, tenantId: string): string {

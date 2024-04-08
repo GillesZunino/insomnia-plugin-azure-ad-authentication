@@ -2,7 +2,7 @@
 // Copyright 2023, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-export default interface AzureADApplicationOptions {
+export default interface EntraIdApplicationOptions {
     authority: string;
     tenantId: string;
     clientId: string;

@@ -9,22 +9,22 @@ import fs from "fs";
 import TokenType from "./TokenType";
 import TokenGrantFlow from "./TokenGrantFlow";
 import { TemplatePluginArgumentsPosition } from "./TemplateTagArguments";
-import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeAzureADScopes, isRedirectUriValid, normalizeTokenGrantFlow, normalizeTokenType, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
-import { getAuthenticationErrorMessageFromException, getTokenByType } from "./AzureADUtilities";
-import AzureADClientApplication from "./AzureADClientApplication";
+import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeEntraIdScopes, isRedirectUriValid, normalizeTokenGrantFlow, normalizeTokenType, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
+import { getAuthenticationErrorMessageFromException, getTokenByType } from "./EntraIdUtilities";
+import EntraIdClientApplication from "./EntraIdClientApplication";
 
 
 
 export default class TemplateTagPlugin {
-    private azureAdClientApplication: AzureADClientApplication;
+    private entraIdClientApplication: EntraIdClientApplication;
 
-    public constructor(azureAdClientApplication: AzureADClientApplication) {
-        this.azureAdClientApplication = azureAdClientApplication;
+    public constructor(entraIdClientApplication: EntraIdClientApplication) {
+        this.entraIdClientApplication = entraIdClientApplication;
     }
 
     public async pluginMain(context: any, args: any[]): Promise<string | null | undefined> {
-        // Configure the Azure AD persistence store to retrieve saved accounts
-        this.azureAdClientApplication.ensureStore(context.store);
+        // Configure the Entra ID persistence store to retrieve saved accounts
+        this.entraIdClientApplication.ensureStore(context.store);
 
         
         // Validate arguments
@@ -143,16 +143,16 @@ export default class TemplateTagPlugin {
         }
 
         
-        const normalizedScopes: string[] = normalizeAzureADScopes(scopes);
+        const normalizedScopes: string[] = normalizeEntraIdScopes(scopes);
 
         switch (normalizedTokenGrantFlow) {
             case TokenGrantFlow.oauth2AuthorizationCode: {
-                // Apply configuration to our Azure AD Application - This handles cases where the config has changed
-                const configurationChanged: boolean = await this.azureAdClientApplication.configure({ authority: authority, tenantId: tenantId, clientId: clientId });
+                // Apply configuration to our ENtra ID Application - This handles cases where the config has changed
+                const configurationChanged: boolean = await this.entraIdClientApplication.configure({ authority: authority, tenantId: tenantId, clientId: clientId });
                 
                 // First, try to acquire a token silently
                 try {
-                    const silentAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateSilentAsync(normalizedScopes);
+                    const silentAuthenticationResult: msal.AuthenticationResult | null = await this.entraIdClientApplication.authenticateSilentAsync(normalizedScopes);
                     if (silentAuthenticationResult) {
                         return getTokenByType(silentAuthenticationResult, tokenType);
                     }
@@ -164,19 +164,19 @@ export default class TemplateTagPlugin {
 
                 // If we could not acquire a token silently, offer to log in interactively when a request is being sent
                 if (this.isSendingRequest(context)) {
-                    const interactiveAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateInteractiveAsync(normalizedScopes, redirectUri);
+                    const interactiveAuthenticationResult: msal.AuthenticationResult | null = await this.entraIdClientApplication.authenticateInteractiveAsync(normalizedScopes, redirectUri);
                     if (interactiveAuthenticationResult) {
                         return getTokenByType(interactiveAuthenticationResult, tokenType);
                     } else {
-                        throw new Error("Could not retrieve a token from Azure AD - Unspecified error");
+                        throw new Error("Could not retrieve a token from Entra ID - Unspecified error");
                     }
                 }
 
                 return "Send a request to log in";
             }
             case TokenGrantFlow.oauth2ClientCredentialsPSK: {
-                // Apply configuration to our Azure AD Application - This handles cases where the config has changed
-                const configurationChanged: boolean = await this.azureAdClientApplication.configure({
+                // Apply configuration to our Entra ID Application - This handles cases where the config has changed
+                const configurationChanged: boolean = await this.entraIdClientApplication.configure({
                     authority: authority,
                     tenantId: tenantId,
                     clientId: clientId,
@@ -184,16 +184,16 @@ export default class TemplateTagPlugin {
                 });
 
                 // Client credentials only offers silent token acquisition
-                const clientCredentialsAuthenticationResult: msal.AuthenticationResult | null = await this.azureAdClientApplication.authenticateWithClientCredentialsAsync(normalizedScopes);
+                const clientCredentialsAuthenticationResult: msal.AuthenticationResult | null = await this.entraIdClientApplication.authenticateWithClientCredentialsAsync(normalizedScopes);
                 if (clientCredentialsAuthenticationResult !== null) {
                     return getTokenByType(clientCredentialsAuthenticationResult, TokenType.accessToken);
                 } else {
-                    throw new Error("Could not retrieve a token from Azure AD - Unspecified error");
+                    throw new Error("Could not retrieve a token from Entra ID - Unspecified error");
                 }
             }
             case TokenGrantFlow.oauth2ClientCredentialsCertificate: {
-                // Apply configuration to our Azure AD Application - This handles cases where the config has changed
-                const configurationChanged: boolean = await this.azureAdClientApplication.configure({
+                // Apply configuration to our Entra ID Application - This handles cases where the config has changed
+                const configurationChanged: boolean = await this.entraIdClientApplication.configure({
                     authority: authority,
                     tenantId: tenantId,
                     clientId: clientId,
@@ -207,11 +207,11 @@ export default class TemplateTagPlugin {
                 });
 
                 // Client credentials only offers silent token acquisition
-                const clientCredentialsAuthenticationResult = await this.azureAdClientApplication.authenticateWithClientCredentialsAsync(normalizedScopes);
+                const clientCredentialsAuthenticationResult = await this.entraIdClientApplication.authenticateWithClientCredentialsAsync(normalizedScopes);
                 if (clientCredentialsAuthenticationResult !== null) {
                     return getTokenByType(clientCredentialsAuthenticationResult, TokenType.accessToken);
                 } else {
-                    throw new Error("Could not retrieve a token from Azure AD - Unspecified error");
+                    throw new Error("Could not retrieve a token from Entra ID - Unspecified error");
                 }
             }
         }

@@ -13,15 +13,15 @@
   },
   "keywords": [
     "azure",
-    "AAD",
+    "microsoft entra",
     "oauth",
     "insomnia",
     "plugin"
   ],
   "insomnia": {
     "name": "azure-ad-authentication",
-    "displayName": "Azure AD Token",
-    "description": "Easily retrieve Azure AD tokens",
+    "displayName": "Entra ID Token",
+    "description": "Easily retrieve Microsoft Entra ID tokens",
     "images": {
       "icon": "images/azure-active-directory.svg",
       "cover": "images/azure-active-directory.svg"

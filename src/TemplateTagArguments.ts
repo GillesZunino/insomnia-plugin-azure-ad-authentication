@@ -9,27 +9,27 @@ import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid, is
 
 const TemplateTagPluginArguments = [{
     displayName: "Authority",
-    description: "Azure AD Authority",
-    help: "Azure AD endpoint to use when retrieving tokens",
+    description: "Entra ID Authority",
+    help: "Microsoft Entra ID endpoint to use when retrieving tokens",
     defaultValue: "https://login.microsoftonline.com",
     type: "enum",
     options: [{
-        displayName: "Azure AD global service",
+        displayName: "Entra ID global service",
         value: "https://login.microsoftonline.com",
         description: "https://login.microsoftonline.com"
     },
     {
-        displayName: "Azure AD for US Government",
+        displayName: "Entra ID for US Government",
         value: "https://login.microsoftonline.us",
         description: "https://login.microsoftonline.us"
     },
     {
-        displayName: "Azure AD Germany",
+        displayName: "Entra ID Germany",
         value: "https://login.microsoftonline.de",
         description: "https://login.microsoftonline.de"
     },
     {
-        displayName: "Azure AD China operated by 21Vianet",
+        displayName: "Entra ID China operated by 21Vianet",
         value: "https://login.chinacloudapi.cn",
         description: "https://login.chinacloudapi.cn"
     }]
@@ -37,7 +37,7 @@ const TemplateTagPluginArguments = [{
 {
     displayName: "Directory (tenant) ID",
     description: "Directory (tenant) ID ('common', 'consumers', 'organizations', a tenant name or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')",
-    help: "The Azure AD tenant. Can be 'common', 'consumers', 'organizations', a domain like 'contoso.com' or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'",
+    help: "The Microsoft Entra ID tenant. Can be 'common', 'consumers', 'organizations', a domain like 'contoso.com' or a GUID like 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'",
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isTenantIdValid(arg);
@@ -56,7 +56,7 @@ const TemplateTagPluginArguments = [{
 },
 {
     displayName: "Scopes",
-    description: "Scopes to request the Azure AD token for, separated by space",
+    description: "Scopes to request the Entra ID token for, separated by space",
     help: (args: any[]): string => {
         const isClientCredentialFlow: boolean = 
                 (args.length >= TemplatePluginArgumentsPosition.TokenGrantFlow + 1) &&
@@ -75,13 +75,13 @@ const TemplateTagPluginArguments = [{
 },
 {
     displayName: "Redirect URI",
-    description: "A URI Azure AD will accept as destination when returning authentication responses (tokens) after successfully authenticating users",
-    help: "One of the Redirect URI configured in Azure AD. Examples include 'http://localhost:1234/redirect' or 'http://localhost:6090/openid'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.",
+    description: "A URI Entra ID will accept as destination when returning authentication responses (tokens) after successfully authenticating users",
+    help: "One of the Redirect URI configured in Microsoft Entra ID. Examples include 'http://localhost:1234/redirect' or 'http://localhost:6090/openid'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.",
     defaultValue: "http://localhost:1234/redirect",
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
-        return isValid ? "" : "Must be a valid Redirect URI like 'http://localhost:1234/redirect'. With http, Azure AD requires 'http://localhost'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.";
+        return isValid ? "" : "Must be a valid Redirect URI like 'http://localhost:1234/redirect'. With http, Entra ID requires 'http://localhost'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.";
     }
 },
 {
@@ -123,8 +123,8 @@ const TemplateTagPluginArguments = [{
 },
 {
     displayName: "Certificate Thumbprint",
-    description: "Thumbprint of certificate registered with Azure AD",
-    help: "Thumbprint of certificate registered with Azure AD",
+    description: "Thumbprint of certificate registered with Entra ID",
+    help: "Thumbprint of certificate registered with Microsoft Entra ID",
     defaultValue: "",
     type: "string",
     validate: (arg: any): string => {
