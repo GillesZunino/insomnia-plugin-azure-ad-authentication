@@ -49,7 +49,7 @@
     "prepublishOnly": "npm run build:prod"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@azure/msal-node": "2.6.6",
