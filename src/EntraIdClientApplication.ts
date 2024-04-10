@@ -28,7 +28,7 @@ export default class EntraIdClientApplication {
         // Last successful authentication result
         this.currentAuthenticationResult = null;
 
-        // Micrtosoft Entra ID application configuration
+        // Microsoft Entra ID application configuration
         this.clientApplication = null;
         this.clientConfig = {
             auth: {

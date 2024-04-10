@@ -23,8 +23,8 @@
     "displayName": "Entra ID Token",
     "description": "Easily retrieve Microsoft Entra ID tokens",
     "images": {
-      "icon": "images/azure-active-directory.svg",
-      "cover": "images/azure-active-directory.svg"
+      "icon": "images/microsoft-entra-id.svg",
+      "cover": "images/microsoft-entra-id.svg"
     },
     "publisher": {
       "name": "Gilles Zunino"
@@ -38,7 +38,7 @@
   "main": "dist/index.js",
   "files": [
     "dist",
-    "images/azure-active-directory.svg"
+    "images/microsoft-entra-id.svg"
   ],
   "scripts": {
     "build:dev": "npx webpack --config webpack.dev.js",

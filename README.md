@@ -20,16 +20,16 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
 # Usage
 1. Open a new request, switch to the "Headers" tab,
-2. In the header name field, enter `Authorization`,
-3. In the value field type `Bearer` <kbd>control</kbd> + <kbd>space</kbd> `azure`. This will bring the template tag menu and reveal the Entra ID Authorization template:
+2. Insert a new header. In the header name field, enter `Authorization`,
+3. In the value field type `Bearer` <kbd>control</kbd> + <kbd>space</kbd> `entra`. This will bring the template tag menu and reveal the Entra ID Authorization template:
 
    ![Ctrl+Space Template Tag Menu](images/create-tag.png)
 
-4. Choose the desired Microsoft Entra instance. Most users will choose `Entra AD global service`. The tag will display its logged out form as follows:
+4. Choose the desired Microsoft Entra instance. Most users will choose `Entra ID global service`. The tag will display its unconfigured form as follows:
 
-   ![Logged out Template Tag](images/Loggedout-tag.png)
+   ![Logged out Template Tag](images/loggedout-tag.png)
 
-5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`. Choose the desired Scopes, Redirect Url (see [configure Microsoft Entra ID Application](#Configuring-the-Microsoft-Entra-ID-application)) and Token Grant Flow (see [Choosing a token grant flow](#Choosing-a-token-grant-flow)).
+5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`. Choose the desired Scopes, Redirect URI (see [configure Microsoft Entra ID Application](#Configuring-the-Microsoft-Entra-ID-application)) and Token Grant Flow (see [Choosing a token grant flow](#Choosing-a-token-grant-flow)).
 
    ![Template Tag Properties](images/tag-properties.png)
 
@@ -38,12 +38,25 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
    ![Template Tag Properties](images/loggedin-tag.png)
 
-# Configuring the MIcrosoft Entra ID application
-This plugin **requires** the Redirect URI specified during step 5 above to be configured under "**Mobile and Desktop applications**" or "**Web**" in Microsoft Entra ID. Other platforms (including "Single Page Application") are not currently supported. See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for additional details. By default, the Redirect URI is `http://127.0.0.1:1234/redirect`. An example of Microsoft Entra ID application Redirect URIs can be seen below:
+# Configuring the Microsoft Entra ID application
+This plugin **requires** the Redirect URI specified during step 5 above to be configured under "**Mobile and Desktop applications**" or "**Web**" in Microsoft Entra ID. Other platforms (including "Single Page Application") are not currently supported.
 
-   ![Entra ID Redirect URIs](images/AzureAD-Mobile-Desktop-ReturnUri.png)
+By default, the Redirect URI is `http://127.0.0.1:1234/redirect` and most users should configure their Microsoft Entra ID application with this default return URI. If you are unable to configure Microsoft Entra ID with `http`, see [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for instructions on how to change the application manifest. For web browser token grant flows, the only practical option is a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
 
-For web browser token grant flows, it is best to choose a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`. Postman style callback URLs (aka `https://oauth.pstmn.io/v1/callback` and variants) are not currently supported. See [Issue #10 - Error: RangeError: options.port should be >= 0 and < 65536. Received type number (NaN).](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/10). 
+An example of Microsoft Entra ID application Redirect URIs can be seen below:
+
+   ![Entra ID Redirect URIs](images/entra-mobile-desktop-return-uri.png)
+
+The following Redirect URI styles are **supported**:
+   1. `http://127.0.0.1:<port></path>` where `port` is a valid, port number above 1000 and available for binding. Examples include: `http://127.0.0.1:1234` or `http://127.0.0.1:1234/openid`,
+   2. `http://<dns-name>:<port></path>` where `dns-name` resolves to 127.0.0.1 via an entry in the local machine `hosts` file. Examples include: `http://myapp:1234` or `http://myapp:1234/openid`.
+
+
+
+The following Redirect URI styles are **not supported**:
+   1. Use of `https`. The plugin currently only supports `http` for Redirect URI,
+   2. Use of `localhost`. Most web browsers block navigation to `localhost` or force the use of `https` which the plugin does not currently support,
+   3. Postman style callback URLs (aka `https://oauth.pstmn.io/v1/callback` and variants). On most computers, `oauth.pstmn.io` is a valid DNS name that resolves to an IP address other than `127.0.0.1`.
 
 ## Configure for Shared Secret or Certificate authentication
 Microsoft Entra ID applications can authenticate as themselves wihtou any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
