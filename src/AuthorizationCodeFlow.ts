@@ -25,59 +25,58 @@ export default class AuthorizationCodeFlow {
     }
 
     public async authenticateInteractive(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
-        // Derive protocol, redirect path, base uri and port from the redirect uri given
-        const parsedRedirectUri: URL = new URL(redirectUri);
-        const redirectProtocol: string = parsedRedirectUri.protocol;
-        const redirectPath: string = `${parsedRedirectUri.pathname}`;
-        const redirectBaseUri: string = `${redirectProtocol}//${parsedRedirectUri.host}`;
-
-        // Parse port by defaulting to 80 or 443 if not present
-        let redirectPort: number = parseInt(parsedRedirectUri.port);
-        if (isNaN(redirectPort)) {
-            switch (redirectProtocol) {
-                case "http:":
-                    redirectPort = 80;
-                    break;
-                case "https:":
-                    redirectPort = 443;
-                    break;
-                default:
-                    throw new Error(`Unsupported protocol: ${redirectProtocol}`);
-            }
-        }
-
         let authenticationResult: msal.AuthenticationResult | null = null;
 
         if (this.publicClientApplication.instance !== null) {
             const authenticationResultPromiseCompletionSource: PromiseCompletionSource<msal.AuthenticationResult | null> = new PromiseCompletionSource();
+            
+            let pkceVerifier: string | null = null;
+            let authCodeUrl: string | null = null;
+            
+            try {
+                // Create PKCE verifier and challenge
+                const cryptoProvider: msal.CryptoProvider = new msal.CryptoProvider();
 
-            const app: express.Application = express.default();
+                let pkceChallenge: string;
+                ( { verifier: pkceVerifier, challenge: pkceChallenge } = await cryptoProvider.generatePkceCodes() );
 
-            app.get("/", async (request, response) => {
-                // Get url to sign user in and consent to scopes needed for application
-                if (this.publicClientApplication.instance !== null) {
-                    const authCodeUrlParameters: msal.AuthorizationUrlRequest = {
-                        scopes: scopes,
-                        redirectUri: redirectUri,
-                        responseMode: msal.ResponseMode.QUERY,
-                        prompt: "select_account"
-                    };
+                // Retrieve the Authentication url - This is where the systen browser will be navigated to
+                const authCodeUrlParameters:msal.AuthorizationUrlRequest = {
+                    scopes: scopes,
+                    redirectUri: redirectUri,
+                    codeChallenge: pkceChallenge,
+                    codeChallengeMethod: "S256",
+                    //responseMode: msal.ResponseMode.QUERY,
+                    prompt: "select_account"
+                };
+                authCodeUrl = await this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters);
+            }
+            finally {
 
-                    try {
-                        const authRedirectUri: string = await this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters);
-                        response.redirect(authRedirectUri);
-                    }
-                    catch (e: unknown) {
-                        response.status(200).send(this.formatErrorHtml(getAuthenticationErrorMessageFromException(e))).end();
-                        authenticationResultPromiseCompletionSource.reject(e);
-                    }
-                } else {
-                    const message: string = "Entra ID Public Client Application was not initialized properly";
-                    const error: Error = new Error(message);
-                    response.status(200).send(this.formatErrorHtml(message)).end();
-                    authenticationResultPromiseCompletionSource.reject(error);
+            }
+
+            // Derive protocol, redirect path, base uri and port from the redirect uri given
+            const parsedRedirectUri: URL = new URL(redirectUri);
+            const redirectProtocol: string = parsedRedirectUri.protocol;
+            const redirectPath: string = `${parsedRedirectUri.pathname}`;
+
+            // Parse port and default to 80 or 443 if not provided
+            let redirectPort: number = parseInt(parsedRedirectUri.port);
+            if (isNaN(redirectPort)) {
+                switch (redirectProtocol) {
+                    case "http:":
+                        redirectPort = 80;
+                        break;
+                    case "https:":
+                        redirectPort = 443;
+                        break;
+                    default:
+                        throw new Error(`Unsupported protocol: ${redirectProtocol}`);
                 }
-            });
+            }
+
+            // Bind a web server to the given IP:Port and path sow e can retrieve the Entra ID result url
+            const app: express.Application = express.default();
 
             app.get(redirectPath, async (request, response) => {
                 if (typeof request.query?.code === "string") {
@@ -85,8 +84,9 @@ export default class AuthorizationCodeFlow {
                     const code: string | null = request.query?.code as string;
                     const tokenRequest: msal.AuthorizationCodeRequest = {
                         code: code,
+                        codeVerifier: pkceVerifier,
                         scopes: scopes,
-                        redirectUri: redirectUri,
+                        redirectUri: redirectUri
                     };
 
                     // Redeem the code for an authentication result
@@ -118,18 +118,18 @@ export default class AuthorizationCodeFlow {
             });
 
 
-            // Trigger the authentication flow: Open the default browser, point it to '/'. This starts the Entra AD Authorization Code flow
+            // Trigger the authentication flow: Open the system browser and navigate it to the authentcation url
             let server: Server | null = null;
             let httpConnectionsTerminator: HttpTerminator | null = null;
             let browserProcess: ChildProcess | null = null;
 
-            try {
-                // Listen for requests
+           try {
+                // Listen for requests so we can capture the result of the Entra ID authentication flow
                 server = app.listen(redirectPort, () => console.log(`Listening on port ${redirectPort}`));
                 httpConnectionsTerminator = new HttpTerminator(server, { gracefulTerminationTimeout: 1000 });
 
-                // Open the user's default web browser and navigate it to the redirect uri (aka '/' handler above)
-                browserProcess = await open.default(redirectBaseUri);
+                // Open the system web browser and navigate it to the Entra ID authentication url
+                browserProcess = await open.default(authCodeUrl);
 
                 // Wait for browser interaction to complete
                 authenticationResult = await authenticationResultPromiseCompletionSource.promise;

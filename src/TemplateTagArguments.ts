@@ -75,13 +75,13 @@ const TemplateTagPluginArguments = [{
 },
 {
     displayName: "Redirect URI",
-    description: "A URI Entra ID will accept as destination when returning authentication responses (tokens) after successfully authenticating users",
-    help: "One of the Redirect URI configured in Microsoft Entra ID. Examples include 'http://localhost:1234/redirect' or 'http://localhost:6090/openid'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.",
-    defaultValue: "http://localhost:1234/redirect",
+    description: "A URI Entra ID will accept as destination when returning authentication responses (tokens or codes) after successfully authenticating users",
+    help: "One of the Redirect URI configured in Microsoft Entra ID. Examples include 'http://127.0.0.1:1234/redirect' or 'http://127.0.0.1:6090/openid'. Insomnia will listen on this port and path on the local machine during authentication. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.",
+    defaultValue: "http://127.0.0.1:1234/redirect",
     type: "string",
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
-        return isValid ? "" : "Must be a valid Redirect URI like 'http://localhost:1234/redirect'. With http, Entra ID requires 'http://localhost'. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.";
+        return isValid ? "" : "Must be a valid URI like 'http://127.0.0.1:1234/redirect'. 'https://' or Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.";
     }
 },
 {
