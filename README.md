@@ -61,6 +61,8 @@ The following Redirect URI styles are **not supported**:
 ## Configure for Shared Secret or Certificate authentication
 Microsoft Entra ID applications can authenticate as themselves wihtou any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
 
+Learn more about Microsoft Entra ID Redirect URIs with [Redirect URI (reply URL) restrictions and limitations](https://learn.microsoft.com/en-us/entra/identity-platform/reply-url).
+
 # Choosing a token grant flow
 This plugin supports the following OAuth 2.0 grant flows. For more information on OAuth 2.0 flows, see [Scenarios and supported authentication flows](https://learn.microsoft.com/en-us/azure/active-directory/develop/authentication-flows-app-scenarios#scenarios-and-supported-authentication-flows")
 1. Authorization code with PKCE - [Authorization code flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow),
