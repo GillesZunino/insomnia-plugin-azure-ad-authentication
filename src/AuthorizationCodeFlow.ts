@@ -29,31 +29,21 @@ export default class AuthorizationCodeFlow {
 
         if (this.publicClientApplication.instance !== null) {
             const authenticationResultPromiseCompletionSource: PromiseCompletionSource<msal.AuthenticationResult | null> = new PromiseCompletionSource();
-            
-            let pkceVerifier: string | null = null;
-            let authCodeUrl: string | null = null;
-            
-            try {
-                // Create PKCE verifier and challenge
-                const cryptoProvider: msal.CryptoProvider = new msal.CryptoProvider();
 
-                let pkceChallenge: string;
-                ( { verifier: pkceVerifier, challenge: pkceChallenge } = await cryptoProvider.generatePkceCodes() );
+            // Create PKCE verifier and challenge
+            const cryptoProvider: msal.CryptoProvider = new msal.CryptoProvider();
+            const { verifier: pkceVerifier, challenge: pkceChallenge } = await cryptoProvider.generatePkceCodes();
 
-                // Retrieve the Authentication url - This is where the systen browser will be navigated to
-                const authCodeUrlParameters:msal.AuthorizationUrlRequest = {
-                    scopes: scopes,
-                    redirectUri: redirectUri,
-                    codeChallenge: pkceChallenge,
-                    codeChallengeMethod: "S256",
-                    //responseMode: msal.ResponseMode.QUERY,
-                    prompt: "select_account"
-                };
-                authCodeUrl = await this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters);
-            }
-            finally {
-
-            }
+            // Retrieve the Authentication url - This is where the systen browser will be navigated to
+            const authCodeUrlParameters:msal.AuthorizationUrlRequest = {
+                scopes: scopes,
+                redirectUri: redirectUri,
+                codeChallenge: pkceChallenge,
+                codeChallengeMethod: "S256",
+                responseMode: msal.ResponseMode.QUERY,
+                prompt: "select_account"
+            };
+            const authCodeUrl: string = await this.publicClientApplication.instance.getAuthCodeUrl(authCodeUrlParameters);
 
             // Derive protocol, redirect path, base uri and port from the redirect uri given
             const parsedRedirectUri: URL = new URL(redirectUri);
