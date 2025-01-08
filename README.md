@@ -59,7 +59,7 @@ The following Redirect URI styles are **not supported**:
    3. Postman style callback URLs (aka `https://oauth.pstmn.io/v1/callback` and variants). On most computers, `oauth.pstmn.io` is a valid DNS name that resolves to an IP address other than `127.0.0.1`.
 
 ## Configure for Shared Secret or Certificate authentication
-Microsoft Entra ID applications can authenticate as themselves wihtou any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
+Microsoft Entra ID applications can authenticate as themselves without any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
 
 Learn more about Microsoft Entra ID Redirect URIs with [Redirect URI (reply URL) restrictions and limitations](https://learn.microsoft.com/en-us/entra/identity-platform/reply-url).
 
