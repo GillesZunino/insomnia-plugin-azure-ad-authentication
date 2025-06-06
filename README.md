@@ -45,7 +45,7 @@ This plugin **requires** the Redirect URI specified during step 5 above to be co
 By default, the Redirect URI is `http://127.0.0.1:1234/redirect` and most users should configure their Microsoft Entra ID application with this default return URI.
 
 
-## I am unable to create or configure an application  `http://localhost`. The portal wants `https` if the host is `localhost`
+## I am unable to create or configure an application with a `http://localhost` Redirect URI. The portal wants `https` if the host is `localhost`
 See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for instructions on how to force the redirect url to start with `http`. The idea is to edit the application manifest as follows:
 1. Configure the redirect url with `https` instead of `http`,
 2. In the Entra ID portal, click on `Manifest`. This will open an editor with the application manifest as JSON,
@@ -57,6 +57,10 @@ For web browser token grant flows, the only practical option is a Redirect URI t
 An example of Microsoft Entra ID application Redirect URIs can be seen below:
 
    ![Entra ID Redirect URIs](images/entra-mobile-desktop-return-uri.png)
+
+When using "**Mobile and Desktop applications**", also select "Allow public client flows" as shown below:
+
+   ![Allow public client flows](images/allow-public-client-flow.png)
 
 The following Redirect URI styles are **supported**:
    1. `http://127.0.0.1:<port></path>` where `port` is a valid port number above 1000 and available for binding. Examples include: `http://127.0.0.1:1234` or `http://127.0.0.1:1234/openid`,

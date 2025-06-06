@@ -22,7 +22,6 @@
       "module": "nodenext",
       "moduleResolution": "nodenext",
       "importHelpers": false,
-      "esModuleInterop": false,
 
       "sourceMap": true,
 
