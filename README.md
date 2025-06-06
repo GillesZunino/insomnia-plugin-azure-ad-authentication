@@ -12,11 +12,12 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 # Installation
 1. Start Insomnia,
 2. Click "Application" -> "Preferences" and choose the "Plugins" tab,
-3. Enter `insomnia-plugin-azure-ad-authentication` and click "Install Plugin",
+3. **Click "Allow elevated access for plugins"**,
+4. Enter `insomnia-plugin-azure-ad-authentication` and click "Install Plugin",
 
     ![Plugin Installation](images/installation.png)
 
-4. Close the dialog.
+5. Close the dialog.
 
 # Usage
 1. Open a new request, switch to the "Headers" tab,
