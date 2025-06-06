@@ -34,7 +34,7 @@ export function isRedirectUriValid(redirectUri: string | null | undefined): bool
         try {
             const parsedRedirectUri: URL = new URL(redirectUri);
 
-            // Explicitely reject 'Postman callback' style URLs or 'localhost' based URLs. We do not currently support these
+            // Explicitly reject 'Postman callback' style URLs or 'localhost' based URLs. We do not currently support these
             if (parsedRedirectUri.hostname.toLowerCase().endsWith("pstmn.io") || (parsedRedirectUri.hostname.toLowerCase() === "localhost")) {
                 return false;
             }

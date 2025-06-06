@@ -141,7 +141,7 @@ const TemplateTagPluginArguments = [{
 },
 {
     displayName: "Certificate Private Key",
-    description: "Certificate private key n PEM format",
+    description: "Certificate private key in PEM format",
     help: "Certificate to sign the client assertion - See https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#second-case-access-token-request-with-a-certificate",
     defaultValue: "",
     type: "file",

@@ -34,7 +34,7 @@ export default class AuthorizationCodeFlow {
             const cryptoProvider: msal.CryptoProvider = new msal.CryptoProvider();
             const { verifier: pkceVerifier, challenge: pkceChallenge } = await cryptoProvider.generatePkceCodes();
 
-            // Retrieve the Authentication url - This is where the systen browser will be navigated to
+            // Retrieve the Authentication url - This is where the system browser will be navigated to
             const authCodeUrlParameters:msal.AuthorizationUrlRequest = {
                 scopes: scopes,
                 redirectUri: redirectUri,
@@ -65,7 +65,7 @@ export default class AuthorizationCodeFlow {
                 }
             }
 
-            // Bind a web server to the given IP:Port and path sow e can retrieve the Entra ID result url
+            // Bind a web server to the given IP:Port and path so we can retrieve the Entra ID result url
             const app: express.Application = express.default();
 
             app.get(redirectPath, async (request, response) => {
@@ -108,7 +108,7 @@ export default class AuthorizationCodeFlow {
             });
 
 
-            // Trigger the authentication flow: Open the system browser and navigate it to the authentcation url
+            // Trigger the authentication flow: Open the system browser and navigate it to the authentication url
             let server: Server | null = null;
             let httpConnectionsTerminator: HttpTerminator | null = null;
             let browserProcess: ChildProcess | null = null;
