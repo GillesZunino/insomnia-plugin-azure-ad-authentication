@@ -41,7 +41,17 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 # Configuring the Microsoft Entra ID application
 This plugin **requires** the Redirect URI specified during step 5 above to be configured under "**Mobile and Desktop applications**" or "**Web**" in Microsoft Entra ID. Other platforms (including "Single Page Application") are not currently supported.
 
-By default, the Redirect URI is `http://127.0.0.1:1234/redirect` and most users should configure their Microsoft Entra ID application with this default return URI. If you are unable to configure Microsoft Entra ID with `http`, see [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for instructions on how to change the application manifest. For web browser token grant flows, the only practical option is a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
+By default, the Redirect URI is `http://127.0.0.1:1234/redirect` and most users should configure their Microsoft Entra ID application with this default return URI.
+
+
+## I am unable to create or configure an application  `http://localhost`. The portal wants `https` if the host is `localhost`
+See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for instructions on how to force the redirect url to start with `http`. The idea is to edit the application manifest as follows:
+1. Configure the redirect url with `https` instead of `http`,
+2. In the Entra ID portal, click on `Manifest`. This will open an editor with the application manifest as JSON,
+3. Locate the `redirectUriSettings` object and change the protocol in the url from `https` to `http`,
+4. Press `Save`
+
+For web browser token grant flows, the only practical option is a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
 
 An example of Microsoft Entra ID application Redirect URIs can be seen below:
 
