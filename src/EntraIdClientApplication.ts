@@ -187,7 +187,7 @@ export default class EntraIdClientApplication {
     }
 
     private async getSavedAccountId(): Promise<string | null> {
-        if (await this.insomniaStore.hasItem(EntraIdClientApplication.LastHomeAccountIdKey)) {
+        if (await this.insomniaStore?.hasItem(EntraIdClientApplication.LastHomeAccountIdKey)) {
             return await this.insomniaStore.getItem(EntraIdClientApplication.LastHomeAccountIdKey);
         } else {
             return null;
@@ -195,11 +195,11 @@ export default class EntraIdClientApplication {
     }
 
     private async setSavedAccountId(accountId: string): Promise<void> {
-        return this.insomniaStore.setItem(EntraIdClientApplication.LastHomeAccountIdKey, accountId);
+        return this.insomniaStore?.setItem(EntraIdClientApplication.LastHomeAccountIdKey, accountId);
     }
 
     private async removeSavedAccountId(): Promise<void> {
-        return this.insomniaStore.removeItem(EntraIdClientApplication.LastHomeAccountIdKey);
+        return this.insomniaStore?.removeItem(EntraIdClientApplication.LastHomeAccountIdKey);
     }
 
     private getTenantedAuthority(authority: string, tenantId: string): string {
