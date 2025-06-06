@@ -34,7 +34,7 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
    ![Template Tag Properties](images/tag-properties.png)
 
 6. Close the "Edit Tag" dialog,
-7. Send a request by pressing "Send". If an interactive login has been chosen, a browser window will appears and take you through the regular Microsoft Entra ID login flow possibly including consent. When the authentication completes, the tag will display its logged in form as follows:
+7. Send a request by pressing "Send". If an interactive login has been chosen, a browser window will appear and take you through the regular Microsoft Entra ID login flow, possibly including consent. When the authentication completes, the tag will display its logged in form as follows:
 
    ![Template Tag Properties](images/loggedin-tag.png)
 
@@ -51,14 +51,14 @@ See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomn
 3. Locate the `redirectUriSettings` object and change the protocol in the url from `https` to `http`,
 4. Press `Save`
 
-For web browser token grant flows, the only practical option is a Redirect URI targetting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
+For web browser token grant flows, the only practical option is a Redirect URI targeting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
 
 An example of Microsoft Entra ID application Redirect URIs can be seen below:
 
    ![Entra ID Redirect URIs](images/entra-mobile-desktop-return-uri.png)
 
 The following Redirect URI styles are **supported**:
-   1. `http://127.0.0.1:<port></path>` where `port` is a valid, port number above 1000 and available for binding. Examples include: `http://127.0.0.1:1234` or `http://127.0.0.1:1234/openid`,
+   1. `http://127.0.0.1:<port></path>` where `port` is a valid port number above 1000 and available for binding. Examples include: `http://127.0.0.1:1234` or `http://127.0.0.1:1234/openid`,
    2. `http://<dns-name>:<port></path>` where `dns-name` resolves to 127.0.0.1 via an entry in the local machine `hosts` file. Examples include: `http://myapp:1234` or `http://myapp:1234/openid`.
 
 
@@ -69,7 +69,7 @@ The following Redirect URI styles are **not supported**:
    3. Postman style callback URLs (aka `https://oauth.pstmn.io/v1/callback` and variants). On most computers, `oauth.pstmn.io` is a valid DNS name that resolves to an IP address other than `127.0.0.1`.
 
 ## Configure for Shared Secret or Certificate authentication
-Microsoft Entra ID applications can authenticate as themselves wihtou any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
+Microsoft Entra ID applications can authenticate as themselves without any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
 
 Learn more about Microsoft Entra ID Redirect URIs with [Redirect URI (reply URL) restrictions and limitations](https://learn.microsoft.com/en-us/entra/identity-platform/reply-url).
 
@@ -84,7 +84,7 @@ This is the most common flow. A web browser is opened and users authenticate wit
 
    ![Authorization code with PKCE template tag properties](images/tag-auth-code.png)
 
-When using this flow, the Scopes accepts a space separated list of Microsoft Entra ID permission like `openid offline_access`.
+When using this flow, the Scopes accepts a space separated list of Microsoft Entra ID permissions like `openid offline_access`.
 
 ## Client Credentials - Shared secret
 This flow permits a web service (confidential client) to use its own credentials, instead of impersonating a user, to authenticate when calling another web service. The client presents a pre-established shared secret. This flow is not recommended in production. Create a shared secret in Microsoft Entra ID and paste the secret in the 'Shared Secret' field.
