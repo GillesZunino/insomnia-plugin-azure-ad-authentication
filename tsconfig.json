@@ -18,17 +18,18 @@
     "buildOnSave": false,
 
     "compilerOptions": {
-      "target": "ES2020",
-      "module": "ES2020",
-      "moduleResolution": "node",
+      "target": "ES2024",
+      "module": "nodenext",
+      "moduleResolution": "nodenext",
       "importHelpers": false,
-      "esModuleInterop": true,
+      "esModuleInterop": false,
+
       "sourceMap": true,
 
       "rootDir": "./src",
       "outDir": "./dist",
 
-      "lib": [ "ES2020" ],
+      "lib": [ "ES2023" ],
 
       "declaration": false,
       "strict": true,
