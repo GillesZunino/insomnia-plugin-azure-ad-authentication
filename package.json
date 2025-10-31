@@ -4,7 +4,7 @@
   "license": "MIT",
   "author": {
     "name": "Gilles Zunino",
-    "email": "gzunino@akakani.com",
+    "email": "giiles@zunino.dev",
     "url": "https://gilles.zunino.dev"
   },
   "repository": {
@@ -12,6 +12,7 @@
     "url": "https://github.com/gilleszunino/insomnia-plugin-azure-ad-authentication"
   },
   "keywords": [
+    "authentication",
     "azure",
     "microsoft entra",
     "oauth",
