@@ -53,22 +53,23 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@azure/msal-node": "3.8.1",
-    "express": "5.1.0",
-    "open": "10.2.0",
-    "validator": "13.15.20"
+    "@azure/msal-node": "3.8.4",
+    "@azure/msal-node-extensions": "1.5.26",
+    "express": "5.2.1",
+    "open": "11.0.0",
+    "validator": "13.15.26"
   },
   "devDependencies": {
-    "@types/express": "5.0.5",
-    "@types/node": "24.9.2",
-    "@types/validator": "13.15.4",
+    "@types/express": "5.0.6",
+    "@types/node": "25.0.3",
+    "@types/validator": "13.15.10",
     "eslint-plugin-node": "11.1.0",
     "clean-webpack-plugin": "4.0.0",
-    "terser-webpack-plugin": "5.3.14",
+    "terser-webpack-plugin": "5.3.16",
     "ts-loader": "9.5.4",
     "tsdx": "0.14.1",
     "typescript": "5.9.3",
-    "webpack": "5.102.1",
+    "webpack": "5.104.1",
     "webpack-cli": "6.0.1",
     "webpack-merge": "6.0.1",
     "webpack-node-externals": "3.0.0"
