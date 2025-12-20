@@ -35,7 +35,7 @@ export default class AuthorizationCodeFlow {
             const { verifier: pkceVerifier, challenge: pkceChallenge } = await cryptoProvider.generatePkceCodes();
 
             // Retrieve the Authentication url - This is where the system browser will be navigated to
-            const authCodeUrlParameters:msal.AuthorizationUrlRequest = {
+            const authCodeUrlParameters: msal.AuthorizationUrlRequest = {
                 scopes: scopes,
                 redirectUri: redirectUri,
                 codeChallenge: pkceChallenge,

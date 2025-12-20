@@ -147,7 +147,7 @@ export default class TemplateTagPlugin {
 
         switch (normalizedTokenGrantFlow) {
             case TokenGrantFlow.oauth2AuthorizationCode: {
-                // Apply configuration to our ENtra ID Application - This handles cases where the config has changed
+                // Apply configuration to our Entra ID Application - This handles cases where the config has changed
                 const configurationChanged: boolean = await this.entraIdClientApplication.configure({ authority: authority, tenantId: tenantId, clientId: clientId });
                 
                 // First, try to acquire a token silently
