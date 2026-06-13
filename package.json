@@ -30,11 +30,8 @@
     "publisher": {
       "name": "Gilles Zunino"
     },
-    "applications": {
-      "designer": "*",
-      "core": "*",
-      "cli": "*"
-    }
+    
+    "unlisted": false
   },
   "main": "dist/index.js",
   "files": [
