@@ -7,16 +7,26 @@ import * as validator from "validator";
 import TokenType from "./TokenType";
 import TokenGrantFlow from "./TokenGrantFlow";
 
+export function trimmedStringOrEmptyString(value: string | null | undefined): string {
+    return value ? value.trim() : "";
+}
+
+export function booleanOrFalse(value: boolean | null | undefined): boolean {
+    return (value !== null) && (value !== undefined) ? value : false;
+}
+
 export function isTenantIdValid(tenantId: string | null | undefined): boolean {
-    if (tenantId) {
-        return (tenantId === "common") || (tenantId === "consumers") || (tenantId === "organizations") || validator.default.isFQDN(tenantId) || validator.default.isUUID(tenantId, 4);
+    const tenantIdTrimmed: string = trimmedStringOrEmptyString(tenantId);
+    if (tenantIdTrimmed) {
+        return (tenantIdTrimmed === "common") || (tenantIdTrimmed === "consumers") || (tenantIdTrimmed === "organizations") || validator.default.isFQDN(tenantIdTrimmed) || validator.default.isUUID(tenantIdTrimmed, 4);
     }
     return false;
 }
 
 export function isClientIdValid(clientId: string | null | undefined): boolean {
-    if (clientId) {
-        return validator.default.isUUID(clientId, 4);
+    const clientIdTrimmed: string = trimmedStringOrEmptyString(clientId);
+    if (clientIdTrimmed) {
+        return validator.default.isUUID(clientIdTrimmed, 4);
     }
     return false;
 }

@@ -9,7 +9,7 @@ import fs from "fs";
 import TokenType from "./TokenType";
 import TokenGrantFlow from "./TokenGrantFlow";
 import { TemplatePluginArgumentsPosition } from "./TemplateTagArguments";
-import { isTenantIdValid, isClientIdValid, isScopesValid, normalizeEntraIdScopes, isRedirectUriValid, normalizeTokenGrantFlow, normalizeTokenType, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
+import { trimmedStringOrEmptyString, isTenantIdValid, isClientIdValid, isScopesValid, normalizeEntraIdScopes, isRedirectUriValid, normalizeTokenGrantFlow, normalizeTokenType, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
 import { getAuthenticationErrorMessageFromException, getTokenByType } from "./EntraIdUtilities";
 import EntraIdClientApplication from "./EntraIdClientApplication";
 
@@ -26,23 +26,23 @@ export default class TemplateTagPlugin {
         // Configure the Entra ID persistence store to retrieve saved accounts
         this.entraIdClientApplication.ensureStore(context.store);
 
-        
         // Validate arguments
-        const authority: string | undefined = args[TemplatePluginArgumentsPosition.Authority];
-        const tenantId: string | undefined = args[TemplatePluginArgumentsPosition.TenantId];
-        const clientId: string | undefined = args[TemplatePluginArgumentsPosition.ClientId];
-        const scopes: string | undefined = args[TemplatePluginArgumentsPosition.Scopes];
-        const redirectUri: string | undefined = args[TemplatePluginArgumentsPosition.RedirectUri];
-        const tokenGrantFlow: string | undefined = args[TemplatePluginArgumentsPosition.TokenGrantFlow];
+        const authority: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.Authority]);
+        const tenantId: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.TenantId]);
+        const clientId: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.ClientId]);
+        const scopes: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.Scopes]);
+        const useWindowsNativeBroker: boolean = booleanOrFalse(args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker]);
+        const redirectUri: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.RedirectUri]);
+        const tokenGrantFlow: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.TokenGrantFlow]);
 
-
+        
         // Authority
-        if (!authority) {
+        if (authority === "") {
             throw new Error("'Authority' property is required");
         }
 
         // Tenant ID
-        if (!tenantId) {
+        if (tenantId === "") {
             throw new Error("'Directory (tenant) ID' property is required");
         }
         if (!isTenantIdValid(tenantId)) {
@@ -50,7 +50,7 @@ export default class TemplateTagPlugin {
         }
 
         // Client ID
-        if (!clientId) {
+        if (clientId === "") {
             throw new Error("'Application (client) ID' property is required");
         }
         if (!isClientIdValid(clientId)) {
@@ -58,7 +58,7 @@ export default class TemplateTagPlugin {
         }
 
         // Scopes
-        if (!scopes) {
+        if (scopes === "") {
             throw new Error("'Scopes' property is required");
         }
         if (!isScopesValid(scopes)) {

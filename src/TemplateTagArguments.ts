@@ -4,7 +4,7 @@
 
 import TokenType from "./TokenType";
 import TokenGrantFlow from "./TokenGrantFlow";
-import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
+import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid, isCertificateThumbprintSyntacticallyValid, trimmedStringOrEmptyString } from "./ValidationUtilities";
 
 
 const TemplateTagPluginArguments = [{
