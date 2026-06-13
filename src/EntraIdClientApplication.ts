@@ -33,10 +33,10 @@ export default class EntraIdClientApplication {
         this.clientConfig = {
             auth: {
                 clientId: "",
-                protocolMode: msal.ProtocolMode.AAD,
                 authority: ""
             },
             system: {
+                protocolMode: msal.ProtocolMode.AAD,
                 loggerOptions: {
                     loggerCallback(level: msal.LogLevel, message: string, containsPii: boolean): void {
                         console.log(message);
