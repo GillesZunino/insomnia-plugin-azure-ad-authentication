@@ -5,6 +5,7 @@
 import TokenType from "./TokenType";
 import TokenGrantFlow from "./TokenGrantFlow";
 import { isTenantIdValid, isClientIdValid, isScopesValid, isRedirectUriValid, isCertificateThumbprintSyntacticallyValid, trimmedStringOrEmptyString } from "./ValidationUtilities";
+import { isWindowsOperatingSystem } from "./EnvironmentUtilities";
 
 
 const TemplateTagPluginArguments = [{
@@ -74,11 +75,33 @@ const TemplateTagPluginArguments = [{
     }
 },
 {
+    displayName: "Use Windows Native Broker",
+    description: "Use Windows Native Broker when logging in interactively. This is only available when insomnia runs on Windows.",
+    help: (args: any[]): string => {
+        const clientId: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.ClientId].value);
+        const returnUri: string = isClientIdValid(clientId) ? `ms-appx-web://Microsoft.AAD.BrokerPlugin/${clientId}` : "<Client ID>";
+        return `Present the Windows Native Broker UI when logging in instead of an external browser window. Return URI will be '${returnUri}'`;
+    },
+    defaultValue: false,
+    type: "boolean",
+    hide: (args: any[]): boolean => {
+        return isWindowsOperatingSystem ? false : true;
+    }
+},
+{
     displayName: "Redirect URI",
     description: "A URI Entra ID will accept as destination when returning authentication responses (tokens or codes) after successfully authenticating users",
     help: "One of the Redirect URI configured in Microsoft Entra ID. Examples include 'http://127.0.0.1:1234/redirect' or 'http://127.0.0.1:6090/openid'. Insomnia will listen on this port and path on the local machine during authentication. Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.",
     defaultValue: "http://127.0.0.1:1234/redirect",
     type: "string",
+    hide: (args: any[]): boolean => {
+        if (isWindowsOperatingSystem) {
+            const useWindowsBroker: any = args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker];
+            return useWindowsBroker.value === true;
+        }
+
+        return false;
+    },
     validate: (arg: any): string => {
         const isValid: boolean = isRedirectUriValid(arg);
         return isValid ? "" : "Must be a valid URI like 'http://127.0.0.1:1234/redirect'. 'https://' or Postman callback URLs ('https://oauth.pstmn.io/v1/callback' and variants) are not supported.";
@@ -104,7 +127,15 @@ const TemplateTagPluginArguments = [{
         displayName: "OAuth 2.0 Client Credential grant with Certificate",
         value: TokenGrantFlow.oauth2ClientCredentialsCertificate,
         description: "Authenticate silently with signed client assertion"
-    }]
+    }],
+    hide: (args: any[]): boolean => {
+        if (isWindowsOperatingSystem) {
+            const useWindowsBroker: any = args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker];
+            return useWindowsBroker.value === true;
+        } else {
+            return false;
+        }
+    }
 },
 {
     displayName: "Shared Secret",
@@ -113,12 +144,16 @@ const TemplateTagPluginArguments = [{
     defaultValue: "",
     type: "string",
     validate: (arg: any): string => {
-        return arg ? "" : "Must be a non empty string";
+        const trimmedSecret: string = trimmedStringOrEmptyString(arg);
+        return trimmedSecret !== "" ? "" : "Must be a non empty string";
     },
     hide: (args: any[]): boolean => {
-        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+        const useWindowsBroker: any = args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker];
+        return (isWindowsOperatingSystem && useWindowsBroker.value) ||
+               ((args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
                 !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
-                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsPSK);
+                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsPSK));
+
     }
 },
 {
@@ -128,15 +163,18 @@ const TemplateTagPluginArguments = [{
     defaultValue: "",
     type: "string",
     validate: (arg: any): string => {
-        if (!arg) {
+        const trimmedThumbprint: string = trimmedStringOrEmptyString(arg);
+        if (trimmedThumbprint === "") {
             return "Must be a non empty string";
         }
-        return isCertificateThumbprintSyntacticallyValid(arg) ? "" : "Must contain only numbers and/or letters from A to Z";
+        return isCertificateThumbprintSyntacticallyValid(trimmedThumbprint) ? "" : "Must contain only numbers and/or letters from A to Z";
     },
     hide: (args: any[]): boolean => {
-        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+        const useWindowsBroker: any = args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker];
+        return (isWindowsOperatingSystem && useWindowsBroker.value) ||
+                ((args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
                 !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
-                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsCertificate);
+                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsCertificate));
     }
 },
 {
@@ -147,9 +185,11 @@ const TemplateTagPluginArguments = [{
     type: "file",
     extensions: [ "pem", "key" ],
     hide: (args: any[]): boolean => {
-        return (args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
-        !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
-        (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsCertificate);
+        const useWindowsBroker: any = args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker];
+        return (isWindowsOperatingSystem && useWindowsBroker.value) ||
+               ((args.length < TemplatePluginArgumentsPosition.TokenGrantFlow + 1) ||
+                !args[TemplatePluginArgumentsPosition.TokenGrantFlow] || 
+                (args[TemplatePluginArgumentsPosition.TokenGrantFlow].value !== TokenGrantFlow.oauth2ClientCredentialsCertificate));
     }
 },
 {
@@ -192,6 +232,7 @@ const TemplatePluginArgumentsPosition = {
     TenantId: getArgumentIndexByDisplayName("Directory (tenant) ID"),
     ClientId: getArgumentIndexByDisplayName("Application (client) ID"),
     Scopes: getArgumentIndexByDisplayName("Scopes"),
+    UseWindowsNativeBroker: getArgumentIndexByDisplayName("Use Windows Native Broker"),
     RedirectUri: getArgumentIndexByDisplayName("Redirect URI"),
     TokenGrantFlow: getArgumentIndexByDisplayName("Token Grant Flow"),
     SharedSecret: getArgumentIndexByDisplayName("Shared Secret"),

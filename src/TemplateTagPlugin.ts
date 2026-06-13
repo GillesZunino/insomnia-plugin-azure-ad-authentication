@@ -2,16 +2,18 @@
 // Copyright 2021, Gilles Zunino
 // -----------------------------------------------------------------------------------
 
-import * as msal from "@azure/msal-node";
 import crypto from "crypto";
 import fs from "fs";
+
+import * as msal from "@azure/msal-node";
 
 import TokenType from "./TokenType";
 import TokenGrantFlow from "./TokenGrantFlow";
 import { TemplatePluginArgumentsPosition } from "./TemplateTagArguments";
-import { trimmedStringOrEmptyString, isTenantIdValid, isClientIdValid, isScopesValid, normalizeEntraIdScopes, isRedirectUriValid, normalizeTokenGrantFlow, normalizeTokenType, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
+import { trimmedStringOrEmptyString, booleanOrFalse, isTenantIdValid, isClientIdValid, isScopesValid, normalizeEntraIdScopes, isRedirectUriValid, normalizeTokenGrantFlow, normalizeTokenType, isCertificateThumbprintSyntacticallyValid } from "./ValidationUtilities";
 import { getAuthenticationErrorMessageFromException, getTokenByType } from "./EntraIdUtilities";
 import EntraIdClientApplication from "./EntraIdClientApplication";
+import { isWindowsOperatingSystem } from "./EnvironmentUtilities";
 
 
 
@@ -26,12 +28,14 @@ export default class TemplateTagPlugin {
         // Configure the Entra ID persistence store to retrieve saved accounts
         this.entraIdClientApplication.ensureStore(context.store);
 
+
         // Validate arguments
         const authority: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.Authority]);
         const tenantId: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.TenantId]);
         const clientId: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.ClientId]);
         const scopes: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.Scopes]);
-        const useWindowsNativeBroker: boolean = booleanOrFalse(args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker]);
+        // Windows native broker is only supported on Windows - The plugin will ignore the setting and fall back to a non-native flow on unsupported OSes
+        const useWindowsNativeBroker: boolean = isWindowsOperatingSystem && booleanOrFalse(args[TemplatePluginArgumentsPosition.UseWindowsNativeBroker]);
         const redirectUri: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.RedirectUri]);
         const tokenGrantFlow: string = trimmedStringOrEmptyString(args[TemplatePluginArgumentsPosition.TokenGrantFlow]);
 
@@ -65,22 +69,33 @@ export default class TemplateTagPlugin {
             throw new Error("'Scopes' property must contain at least one valid entry");
         }
 
-        // Redirect Uri
-        if (!redirectUri) {
-            throw new Error("'Redirect URI' property is required");
-        }
-        if (!isRedirectUriValid(redirectUri)) {
-            throw new Error("'Redirect URI' must be valid");
+        // Redirect Uri - Only used (or validated) when not using the Win32 native broker
+        if (!useWindowsNativeBroker) {
+            if (!redirectUri) {
+                throw new Error("'Redirect URI' property is required");
+            }
+            if (!isRedirectUriValid(redirectUri)) {
+                throw new Error("'Redirect URI' must be valid");
+            }
         }
 
-        // Token Grant Flow
-        if (!tokenGrantFlow) {
-            throw new Error("'Token Grant Flow' property is required");
+        // Windows native broker is incompatible with shared secret / certificate authentication
+        let requestedTokenGrantFlow: TokenGrantFlow = TokenGrantFlow.unknown;
+        if (useWindowsNativeBroker) {
+            // When the native broker is requested, force to authorizartion code flow
+            requestedTokenGrantFlow = TokenGrantFlow.oauth2AuthorizationCode;
+        } else {
+            // Validate token Grant Flow
+            if (!tokenGrantFlow) {
+                throw new Error("'Token Grant Flow' property is required");
+            }
+            const { tokenGrantFlowValid, normalizedTokenGrantFlow } = normalizeTokenGrantFlow(tokenGrantFlow);
+            if (!tokenGrantFlowValid) {
+                throw new Error("'Token Grant Flow' property must be valid");
+            }
+            requestedTokenGrantFlow = normalizedTokenGrantFlow;
         }
-        const { tokenGrantFlowValid, normalizedTokenGrantFlow } = normalizeTokenGrantFlow(tokenGrantFlow);
-        if (!tokenGrantFlowValid) {
-            throw new Error("'Token Grant Flow' property must be valid");
-        }
+
 
         let tokenType: TokenType = TokenType.unknown;
         let sharedSecret: string = "";
@@ -88,7 +103,7 @@ export default class TemplateTagPlugin {
         let privateKeyObject: crypto.KeyObject | null = null;
 
         // Perform validation based on the token grant flow chosen
-        switch (normalizedTokenGrantFlow) {
+        switch (requestedTokenGrantFlow) {
             case TokenGrantFlow.oauth2AuthorizationCode: {
                 // Must have a valid token type
                 const rawTokenType: string | undefined = args[TemplatePluginArgumentsPosition.TokenType];
@@ -145,10 +160,10 @@ export default class TemplateTagPlugin {
         
         const normalizedScopes: string[] = normalizeEntraIdScopes(scopes);
 
-        switch (normalizedTokenGrantFlow) {
+        switch (requestedTokenGrantFlow) {
             case TokenGrantFlow.oauth2AuthorizationCode: {
                 // Apply configuration to our Entra ID Application - This handles cases where the config has changed
-                const configurationChanged: boolean = await this.entraIdClientApplication.configure({ authority: authority, tenantId: tenantId, clientId: clientId });
+                const configurationChanged: boolean = await this.entraIdClientApplication.configure({ authority: authority, tenantId: tenantId, clientId: clientId, useWindowsNativeBroker: useWindowsNativeBroker });
                 
                 // First, try to acquire a token silently
                 try {

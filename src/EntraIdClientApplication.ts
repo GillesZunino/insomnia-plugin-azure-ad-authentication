@@ -3,10 +3,13 @@
 // -----------------------------------------------------------------------------------
 
 import * as msal from "@azure/msal-node";
+import { NativeBrokerPlugin } from "@azure/msal-node-extensions";
 
+import { isWindowsOperatingSystem } from "./EnvironmentUtilities";
 import InsomniaPersistencePlugin from "./InsomniaPersistencePlugin";
 import EntraIdApplicationOptions from "./EntraIdApplicationOptions";
 import AuthorizationCodeFlow from "./AuthorizationCodeFlow";
+import NativeBrokerFlow from "./NativeBrokerFlow";
 
 export default class EntraIdClientApplication {
 
@@ -19,6 +22,7 @@ export default class EntraIdClientApplication {
     private currentAuthenticationResult: msal.AuthenticationResult | null;
 
     public get authenticationResult(): msal.AuthenticationResult | null { return this.currentAuthenticationResult; }
+    public get isWindowsNativeBrokerSupported(): boolean { return isWindowsOperatingSystem; }
     public get instance(): msal.PublicClientApplication | msal.ConfidentialClientApplication | null { return this.clientApplication; }
 
     public constructor() {
@@ -59,7 +63,10 @@ export default class EntraIdClientApplication {
 
     public async configure(options: EntraIdApplicationOptions): Promise<boolean> {
         const tenantedAuthority: string = this.getTenantedAuthority(options.authority, options.tenantId);
+        const windowsBrokerRequested: boolean = options.useWindowsNativeBroker !== undefined && options.useWindowsNativeBroker;
+        const useNativeBroker: boolean = windowsBrokerRequested && this.isWindowsNativeBrokerSupported;
         const configurationChanged: boolean = (this.clientConfig.auth.authority !== tenantedAuthority) || (this.clientConfig.auth.clientId !== options.clientId) ||
+                                              ((useNativeBroker && this.clientConfig.broker === undefined) || (!useNativeBroker && this.clientConfig.broker !== undefined)) ||
                                               (this.clientConfig.auth.clientSecret !== options.clientSecret) ||
                                               (this.clientConfig.auth.clientCertificate?.privateKey !== options.clientCertificate?.privateKey) || (this.clientConfig.auth.clientCertificate?.thumbprint !== options.clientCertificate?.thumbprint);
         if (configurationChanged) {
@@ -75,8 +82,7 @@ export default class EntraIdClientApplication {
             // Decide which style of application we will need
             if (!!options.clientCertificate || !!options.clientSecret) {
                 // Confidential application - Shared Secret or Certificate but not both
-
-                // Reset configuration and apply new values
+                this.clientConfig.broker = undefined;
                 this.clientConfig.auth.clientSecret = undefined;
                 this.clientConfig.auth.clientCertificate = undefined;
                 if (options.clientSecret) {
@@ -87,7 +93,14 @@ export default class EntraIdClientApplication {
                 }
                 this.clientApplication = new msal.ConfidentialClientApplication(this.clientConfig);
             } else {
-                // Public application
+                // Public application - Use Broker if it was requested (Windows only for now)
+                if (useNativeBroker) {
+                    const nativeBrokerPlugin: NativeBrokerPlugin = new NativeBrokerPlugin();
+                    nativeBrokerPlugin.setLogger(this.clientConfig.system?.loggerOptions || {});
+                    this.clientConfig.broker = { nativeBrokerPlugin: nativeBrokerPlugin };
+                } else {
+                    this.clientConfig.broker = undefined;
+                }
                 this.clientApplication = new msal.PublicClientApplication(this.clientConfig);
             }
         }
@@ -97,8 +110,15 @@ export default class EntraIdClientApplication {
 
     public async authenticateInteractiveAsync(scopes: string[], redirectUri: string): Promise<msal.AuthenticationResult | null> {
         try {
-            const authorizationCodeFlow: AuthorizationCodeFlow = new AuthorizationCodeFlow(this);
-            this.currentAuthenticationResult = await authorizationCodeFlow.authenticateInteractive(scopes, redirectUri);
+            // Prefer the native broker when available - Otherwise fallback to the external browser flow
+            if (this.instance instanceof msal.PublicClientApplication && this.isWindowsNativeBrokerSupported && this.clientConfig.broker?.nativeBrokerPlugin) {
+                const nativeBrokerFlow: NativeBrokerFlow = new NativeBrokerFlow(this);
+                this.currentAuthenticationResult = await nativeBrokerFlow.authenticateInteractive(scopes);
+            } else {
+                const authorizationCodeFlow: AuthorizationCodeFlow = new AuthorizationCodeFlow(this);
+                this.currentAuthenticationResult = await authorizationCodeFlow.authenticateInteractive(scopes, redirectUri);
+            }
+
             if (this.currentAuthenticationResult) {
                 const homeAccountId: string | undefined = this.currentAuthenticationResult.account?.homeAccountId;
                 if (homeAccountId) {

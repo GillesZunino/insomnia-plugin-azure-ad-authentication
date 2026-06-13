@@ -10,5 +10,6 @@ export default interface EntraIdApplicationOptions {
     clientCertificate?: {
         thumbprint: string;
         privateKey: string;
-    }
+    },
+    useWindowsNativeBroker?: boolean;
 }

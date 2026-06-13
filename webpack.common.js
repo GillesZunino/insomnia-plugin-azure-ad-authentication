@@ -44,14 +44,15 @@ module.exports = {
                 }
             },
             resolve: {
-                extensions: [ ".ts", ".js" ],
+                extensions: [ ".ts", ".js", ".ps1" ],
                 modules: [
                     "node_modules"
                 ]
             },
             module: {
                 rules: [
-                    { test: /\.ts$/i, loader: "ts-loader" }
+                    { test: /\.ts$/i, loader: "ts-loader"   },
+                    { test: /\.ps1$/i, type: "asset/source" }
                 ]
             },
             externals: [ WebpackNodeExternals({

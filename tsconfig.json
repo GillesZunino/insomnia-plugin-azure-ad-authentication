@@ -4,7 +4,8 @@
 
 {
     "include": [
-        "src\\index.ts"
+      "src",
+      "types"
     ],
 
     "exclude": [
