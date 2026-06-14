@@ -52,7 +52,9 @@
     "@azure/msal-node": "5.2.4",
     "@azure/msal-node-extensions": "5.2.4",
     "express": "5.2.1",
+    "node-addon-api": "8.5.0",
     "open": "11.0.0",
+    "prebuild-install": "7.1.3",
     "validator": "13.15.35",
     "powershell-utils": "0.2.0"
   },
