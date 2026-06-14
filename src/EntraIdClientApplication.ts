@@ -5,7 +5,7 @@
 import * as msal from "@azure/msal-node";
 
 import { isWindowsOperatingSystem } from "./EnvironmentUtilities";
-import NativeBrokerPlugin from "./NativeBrokerPlugin";
+import NativeBrokerPlugin from "./Vendor/NativeBrokerPlugin";
 import InsomniaPersistencePlugin from "./InsomniaPersistencePlugin";
 import EntraIdApplicationOptions from "./EntraIdApplicationOptions";
 import AuthorizationCodeFlow from "./AuthorizationCodeFlow";
