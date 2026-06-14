@@ -45,11 +45,8 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 The Entra ID application must be configured correctly before authenticating with the plugin. The configuration depends on the authentication method you choose:
 
 ## [Windows Only] Use Windows Native Broker Checked
-This plugin **requires** a specific Redirect URI to be configured under "**Mobile and Desktop applications**" in Microsoft Entra ID. The Redirect URI must be `ms-appx-web://Microsoft.AAD.BrokerPlugin/<client id>` where `<client id>` is the Application (client) ID.
+This plugin **requires** a specific Redirect URI to be configured under "**Mobile and Desktop applications**" in Microsoft Entra ID. The Redirect URI must be `ms-appx-web://Microsoft.AAD.BrokerPlugin/<client id>` where `<client id>` is the Application (client) ID. When correctly configured, sending a request will trigger the Windows Native Authentication Broker to log in.
 
-When correctly configured, sending a request will trigger the Windows Native Authentication Broker to log in.
-
-   ![Windows Native Broker Setup](images/win-native-broker.mp4)
 
 ## [All Platforms] Use Windows Native Broker Unchecked
 This plugin **requires** the Redirect URI specified during step 5 above to be configured under "**Mobile and Desktop applications**" or "**Web**" in Microsoft Entra ID. Other platforms (including "Single Page Application") are not currently supported.
