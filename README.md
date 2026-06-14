@@ -6,7 +6,7 @@ This plugin supports:
 * Account saving to Insomnia store,
 * Silent log in for saved accounts, even across Insomnia sessions.
 
-# Pre-requisites
+# Prerequisites
 This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API client.
 
 # Installation
@@ -30,26 +30,38 @@ This plugin requires [Insomnia](https://insomnia.rest/), the Open Source API cli
 
    ![Logged out Template Tag](images/loggedout-tag.png)
 
-5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`. Choose the desired Scopes, Redirect URI (see [configure Microsoft Entra ID Application](#Configuring-the-Microsoft-Entra-ID-application)) and Token Grant Flow (see [Choosing a token grant flow](#Choosing-a-token-grant-flow)).
+5. Click on the tag to edit. Specify the Directory (tenant) ID, the Application (client) ID, desired scopes and the Redirect URI. For Microsoft Accounts, set Directory to `consumers`. For Work or School accounts, set Directory to `organizations`, a tenant name or tenant ID (i.e. `contoso.com` or `f0cb5560-5e2a-4b3b-88f9-8193bdd39f7a`). To allow for both Microsoft Accounts and Work or School accounts, select `common`. Choose the desired Scopes, Redirect URI (see [Configuring the Microsoft Entra ID application](#Configuring-the-Microsoft-Entra-ID-application)) and Token Grant Flow (see [Choosing a token grant flow](#Choosing-a-token-grant-flow)).
 
    ![Template Tag Properties](images/tag-properties.png)
 
+   When Insomnia is running on Windows, it is possible to choose to log in with the Windows Native Authentication Broker or with a Web Browser. See [Configuring the Microsoft Entra ID application](#Configuring-the-Microsoft-Entra-ID-application) to configure the Entra ID application for Windows Native Broker or Web Browser.
+
 6. Close the "Edit Tag" dialog,
-7. Send a request by pressing "Send". If an interactive login has been chosen, a browser window will appear and take you through the regular Microsoft Entra ID login flow, possibly including consent. When the authentication completes, the tag will display its logged in form as follows:
+7. Send a request by pressing "Send". If an interactive login has been chosen, a browser window will appear and take you through the regular Microsoft Entra ID login flow, possibly including consent. When the authentication completes, the tag will display its logged-in form as follows:
 
    ![Template Tag Properties](images/loggedin-tag.png)
 
 # Configuring the Microsoft Entra ID application
+The Entra ID application must be configured correctly before authenticating with the plugin. The configuration depends on the authentication method you choose:
+
+## [Windows Only] Use Windows Native Broker Checked
+This plugin **requires** a specific Redirect URI to be configured under "**Mobile and Desktop applications**" in Microsoft Entra ID. The Redirect URI must be `ms-appx-web://Microsoft.AAD.BrokerPlugin/<client id>` where `<client id>` is the Application (client) ID.
+
+When correctly configured, sending a request will trigger the Windows Native Authentication Broker to log in.
+
+   ![Windows Native Broker Setup](images/win-native-broker.mp4)
+
+## [All Platforms] Use Windows Native Broker Unchecked
 This plugin **requires** the Redirect URI specified during step 5 above to be configured under "**Mobile and Desktop applications**" or "**Web**" in Microsoft Entra ID. Other platforms (including "Single Page Application") are not currently supported.
 
 By default, the Redirect URI is `http://127.0.0.1:1234/redirect` and most users should configure their Microsoft Entra ID application with this default return URI.
 
 
-## I am unable to create or configure an application with a `http://localhost` Redirect URI. The portal wants `https` if the host is `localhost`
-See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for instructions on how to force the redirect url to start with `http`. The idea is to edit the application manifest as follows:
-1. Configure the redirect url with `https` instead of `http`,
+### I am unable to create or configure an application with a `http://localhost` Redirect URI. The portal wants `https` if the host is `localhost`
+See [Issue #2 - http not allowed anymore](https://github.com/GillesZunino/insomnia-plugin-azure-ad-authentication/issues/2) for instructions on how to force the redirect URL to start with `http`. The idea is to edit the application manifest as follows:
+1. Configure the redirect URL with `https` instead of `http`,
 2. In the Entra ID portal, click on `Manifest`. This will open an editor with the application manifest as JSON,
-3. Locate the `redirectUriSettings` object and change the protocol in the url from `https` to `http`,
+3. Locate the `redirectUriSettings` object and change the protocol in the URL from `https` to `http`,
 4. Press `Save`
 
 For web browser token grant flows, the only practical option is a Redirect URI targeting `127.0.0.1` instead of `localhost` since some web browsers block navigation to `http://localhost`.
@@ -66,8 +78,6 @@ The following Redirect URI styles are **supported**:
    1. `http://127.0.0.1:<port></path>` where `port` is a valid port number above 1000 and available for binding. Examples include: `http://127.0.0.1:1234` or `http://127.0.0.1:1234/openid`,
    2. `http://<dns-name>:<port></path>` where `dns-name` resolves to 127.0.0.1 via an entry in the local machine `hosts` file. Examples include: `http://myapp:1234` or `http://myapp:1234/openid`.
 
-
-
 The following Redirect URI styles are **not supported**:
    1. Use of `https`. The plugin currently only supports `http` for Redirect URI,
    2. Use of `localhost`. Most web browsers block navigation to `localhost` or force the use of `https` which the plugin does not currently support,
@@ -76,10 +86,10 @@ The following Redirect URI styles are **not supported**:
 ## Configure for Shared Secret or Certificate authentication
 Microsoft Entra ID applications can authenticate as themselves without any user interaction. This capability can be enabled by adding a shared secret (client secret) or a certificate. More details can be found in the Microsoft Entra ID documentation [Quickstart: Register an application with the Microsoft identity platform](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials)
 
-Learn more about Microsoft Entra ID Redirect URIs with [Redirect URI (reply URL) restrictions and limitations](https://learn.microsoft.com/en-us/entra/identity-platform/reply-url).
+Learn more about Microsoft Entra ID Redirect URIs in [Redirect URI (reply URL) restrictions and limitations](https://learn.microsoft.com/en-us/entra/identity-platform/reply-url).
 
 # Choosing a token grant flow
-This plugin supports the following OAuth 2.0 grant flows. For more information on OAuth 2.0 flows, see [Scenarios and supported authentication flows](https://learn.microsoft.com/en-us/azure/active-directory/develop/authentication-flows-app-scenarios#scenarios-and-supported-authentication-flows")
+This plugin supports the following OAuth 2.0 grant flows. For more information on OAuth 2.0 flows, see [Scenarios and supported authentication flows](https://learn.microsoft.com/en-us/azure/active-directory/develop/authentication-flows-app-scenarios#scenarios-and-supported-authentication-flows)
 1. Authorization code with PKCE - [Authorization code flow](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow),
 2. Client Credentials - [Shared secret](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#first-case-access-token-request-with-a-shared-secret),
 3. Client Credentials - [Certificate](https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#second-case-access-token-request-with-a-certificate).
@@ -89,7 +99,7 @@ This is the most common flow. A web browser is opened and users authenticate wit
 
    ![Authorization code with PKCE template tag properties](images/tag-auth-code.png)
 
-When using this flow, the Scopes accepts a space separated list of Microsoft Entra ID permissions like `openid offline_access`.
+When using this flow, the Scopes accepts a space-separated list of Microsoft Entra ID permissions like `openid offline_access`.
 
 ## Client Credentials - Shared secret
 This flow permits a web service (confidential client) to use its own credentials, instead of impersonating a user, to authenticate when calling another web service. The client presents a pre-established shared secret. This flow is not recommended in production. Create a shared secret in Microsoft Entra ID and paste the secret in the 'Shared Secret' field.
